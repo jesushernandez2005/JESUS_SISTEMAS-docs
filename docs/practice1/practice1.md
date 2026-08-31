@@ -29,7 +29,7 @@ Los 4 LEDs representan un número binario que cuenta de `0000` a `1111` (0 a 15)
  
 <!-- ESPACIO PARA VIDEO -->
 <video controls width="640">
-  <source src="RUTA_AL_VIDEO_EJERCICIO1.mp4" type="video/mp4">
+  <source src="ejercicio1.mp4" type="video/mp4">
   Tu navegador no soporta el elemento de video.
 </video>
 ### Código
@@ -54,7 +54,7 @@ Un solo LED encendido que se desplaza de un extremo al otro de los 4 LEDs y regr
  
 <!-- ESPACIO PARA VIDEO -->
 <video controls width="640">
-  <source src="RUTA_AL_VIDEO_EJERCICIO2.mp4" type="video/mp4">
+  <source src="ejercicio2.mp4" type="video/mp4">
   Tu navegador no soporta el elemento de video.
 </video>
 ### Código
@@ -79,7 +79,7 @@ Los LEDs se van encendiendo progresivamente de un lado hasta llenarse todos, y l
  
 <!-- ESPACIO PARA VIDEO -->
 <video controls width="640">
-  <source src="RUTA_AL_VIDEO_EJERCICIO3.mp4" type="video/mp4">
+  <source src="ejercicio3.mp4" type="video/mp4">
   Tu navegador no soporta el elemento de video.
 </video>
 ### Código
@@ -104,7 +104,7 @@ Los LEDs se encienden empezando por los extremos hacia el centro, y luego se apa
  
 <!-- ESPACIO PARA VIDEO -->
 <video controls width="640">
-  <source src="RUTA_AL_VIDEO_EJERCICIO4.mp4" type="video/mp4">
+  <source src="ejercicio4.mp4" type="video/mp4">
   Tu navegador no soporta el elemento de video.
 </video>
 ### Código
