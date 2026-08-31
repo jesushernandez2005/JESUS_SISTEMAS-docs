@@ -1,12 +1,12 @@
 # Embedded Systems
 
-Welcome to my **Embedded Systems** project documentation 👋
+Welcome to my **Embedded Systems** project documentation 
 
 This website contains notes, laboratory practices, projects, and activities developed throughout the course.
 
 ---
 
-## 👨‍💻 About Me
+##  About Me
 
 **Name:** Jesús Hernández
 
@@ -18,17 +18,17 @@ I am an engineering student. During this course, I will work with different tech
 
 ---
 
-## 📚 Course Content
+## Course Content
 
 Throughout this website, I will document the different activities, practices, and projects completed during the semester.
 
-### 🔧 Topics
+### Topics
 
 - Microcontrollers|
 
 ---
 
-## 🚀 Projects
+## Projects
 
 During the course, I will develop different projects using hardware and software to design and implement embedded systems.
 
@@ -44,19 +44,19 @@ Each project will include its own documentation, such as:
 
 ---
 
-## 📝 Laboratory Practices
+## Laboratory Practices
 
 This section will contain the different laboratory practices completed throughout the course.
 
 | Practice | Description | Status |
 |---|---|---|
-| [Practice 1](practice1.md) | GPIO: from SDK functions to hardware registers (RP2350 SIO) | 🟢 In Progress |
+| [Practice 1](practice1/practice1.md) | GPIO: from SDK functions to hardware registers (RP2350 SIO) | 🟢 In Progress |
 | Practice 2 | To be added | ⚪ Pending |
 | Practice 3 | To be added | ⚪ Pending |
 
 ---
 
-## 🎯 Course Objective
+## Course Objective
 
 The objective of this documentation is to maintain an organized record of my learning process and the projects developed throughout the **Embedded Systems** course.
 
@@ -64,7 +64,7 @@ It will also serve as a reference for reviewing the procedures, source code, res
 
 ---
 
-## 🔗 Resources
+## Resources
 
 - [Python](https://www.python.org/)
 - [MkDocs](https://www.mkdocs.org/)
