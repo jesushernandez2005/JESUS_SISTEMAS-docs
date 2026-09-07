@@ -1,69 +1,70 @@
 ---
-title: "GPIO desde el SDK hasta los registros de hardware (RP2350)"
+title: "GPIO from the SDK down to Hardware Registers (RP2350)"
 date: 2026-08-31
-tags: [sistemas-embebidos, raspberry-pi-pico-2, gpio, registros, sio, c]
+tags: [embedded-systems, raspberry-pi-pico-2, gpio, registers, sio, c]
 ---
 
-# GPIO desde el SDK hasta los registros de hardware (RP2350)
+# GPIO from the SDK down to Hardware Registers (RP2350)
 
-## Contexto de la actividad
+## Context
 
-En esta actividad se trabajó con el bloque **SIO (Single-Cycle I/O)** del RP2350 para entender qué hace realmente `gpio_put()` a nivel de hardware. Se partió de un blink hecho con el Pico SDK, se reescribió usando registros (`sio_hw->gpio_set`, `sio_hw->gpio_clr`, `sio_hw->gpio_oe_set`, etc.) y finalmente se resolvieron 4 ejercicios con 4 LEDs conectados a GPIO2–GPIO5, manipulando los registros directamente con máscaras de bits.
+This activity worked with the RP2350's **SIO (Single-Cycle I/O)** block to understand what `gpio_put()` actually does at the hardware level. Starting from an SDK-based blink, it was rewritten using registers (`sio_hw->gpio_set`, `sio_hw->gpio_clr`, `sio_hw->gpio_oe_set`, etc.), then applied to solve 4 exercises with 4 LEDs on GPIO2–GPIO5, driving the registers directly with bitmasks.
 
-**Conexión de hardware:**
+**Hardware connection:**
 
 ```
-GPIO2 → LED0 → resistencia → GND
-GPIO3 → LED1 → resistencia → GND
-GPIO4 → LED2 → resistencia → GND
-GPIO5 → LED3 → resistencia → GND
+GPIO2 → LED0 → resistor → GND
+GPIO3 → LED1 → resistor → GND
+GPIO4 → LED2 → resistor → GND
+GPIO5 → LED3 → resistor → GND
 ```
 
 ---
 
-## Objetivo
+## Objective
 
-Comprender cómo el SDK de Raspberry Pi Pico traduce las funciones de alto nivel (`gpio_put`, `gpio_set_dir`, etc.) en escrituras directas sobre los registros del periférico SIO, y aplicar ese conocimiento para controlar 4 LEDs mediante máscaras de bits, generando distintos patrones de animación (contador binario, luz rebotando, llenado/vaciado progresivo y llenado de afuera hacia adentro).
+Understand how the Raspberry Pi Pico SDK translates high-level functions (`gpio_put`, `gpio_set_dir`, etc.) into direct writes to the SIO peripheral's registers, and use that to drive 4 LEDs with bitmasks, producing different animation patterns (binary counter, bouncing light, progressive fill/drain, and outside-in fill).
 
-## Material y Componentes usados
+## Materials and Components
 
 - 1 × Raspberry Pi Pico 2 W
-- 4 × LED (cualquier color)
-- 4 × Resistencia de 220 Ω (limitadora de corriente)
+- 4 × LED (any color)
+- 4 × 220 Ω resistor (current limiter)
 - 1 × Protoboard
-- Cables jumper macho-macho
-- Cable micro-USB (para programar y alimentar la Pico)
+- Male-to-male jumper wires
+- Micro-USB cable (programming and power)
 
-## Diagrama del circuito
+## Circuit Diagram
 
-La conexión física es la misma para los 4 ejercicios; lo único que cambia es el código que controla los pines. Cada LED se conecta en serie con su resistencia entre el GPIO correspondiente y GND:
+The physical connection is the same for all 4 exercises; only the code controlling the pins changes. Each LED is wired in series with its resistor between the corresponding GPIO and GND:
 
 ```
-GPIO2 → LED0 → resistencia 220Ω → GND
-GPIO3 → LED1 → resistencia 220Ω → GND
-GPIO4 → LED2 → resistencia 220Ω → GND
-GPIO5 → LED3 → resistencia 220Ω → GND
+GPIO2 → LED0 → 220Ω resistor → GND
+GPIO3 → LED1 → 220Ω resistor → GND
+GPIO4 → LED2 → 220Ω resistor → GND
+GPIO5 → LED3 → 220Ω resistor → GND
 ```
 
-<!-- ESPACIO PARA IMAGEN DEL DIAGRAMA DEL CIRCUITO -->
-![Diagrama de conexión de los 4 LEDs](conexion_leds.svg)
+<!-- SPACE FOR CIRCUIT DIAGRAM IMAGE -->
+![4-LED connection diagram](conexion_leds.svg)
 
-La pata larga (ánodo) de cada LED va hacia la resistencia/GPIO, y la pata corta (cátodo) va hacia el riel de GND.
+The LED's long leg (anode) goes to the resistor/GPIO side, and the short leg (cathode) goes to the GND rail.
 
 ---
 
-## Ejercicio 1 — Contador binario de 4 bits
+## Exercise 1 — 4-bit Binary Counter
 
-Los 4 LEDs representan un número binario que cuenta de `0000` a `1111` (0 a 15) y se repite.
+The 4 LEDs represent a binary number counting from `0000` to `1111` (0 to 15), repeating.
 
 ### Video
 
-<!-- ESPACIO PARA VIDEO -->
+<!-- SPACE FOR VIDEO -->
 <video controls width="640">
   <source src="ejercicio1.mp4" type="video/mp4">
-  Tu navegador no soporta el elemento de video.
+  Your browser does not support the video element.
 </video>
-### Código
+
+### Code
 
 ```c
 #include "pico/stdlib.h"
@@ -101,28 +102,27 @@ int main(void) {
 }
 ```
 
-### Lógica utilizada
+### Logic Used
 
-`sumador` es el contador que representa el número en decimal (0 a 15). Como GPIO2 es el primer pin físico usado y no el bit 0 del registro, el valor de `sumador` no se puede escribir directamente en `gpio_set` — hay que recorrerlo 2 posiciones a la izquierda con `sumador << 2` para que sus 4 bits caigan exactamente sobre GPIO2, GPIO3, GPIO4 y GPIO5. Ese desplazamiento se guarda en `numero_binario`.
+`sumador` is the decimal counter (0 to 15). Since GPIO2 is the first physical pin used, not bit 0 of the register, its value has to be shifted left 2 places (`sumador << 2`) so its 4 bits land exactly on GPIO2–GPIO5, stored in `numero_binario`.
 
-Cada vuelta del ciclo primero apaga todo el grupo con `sio_hw->gpio_clr = MASK` (para no arrastrar el patrón del número anterior) y luego enciende únicamente los bits del número actual con `sio_hw->gpio_set = numero_binario`.
-
-`sumador++` hace avanzar la cuenta en cada vuelta, y el `if (sumador > 15) sumador = 0` la reinicia al llegar al máximo representable en 4 bits, produciendo el efecto de "da la vuelta" (0 → 15 → 0 → ...).
+Each loop first clears the whole group (`gpio_clr = MASK`, avoiding leftover bits from the previous number), then sets only the current number's bits (`gpio_set = numero_binario`). `sumador++` advances the count, and `if (sumador > 15) sumador = 0` wraps it back to zero once it exceeds what 4 bits can hold.
 
 ---
 
-## Ejercicio 2 — Luz rebotando (bouncing light)
+## Exercise 2 — Bouncing Light
 
-Un solo LED encendido que se desplaza de un extremo al otro de los 4 LEDs y regresa, en un ciclo continuo.
+A single lit LED that moves from one end of the array to the other and back, continuously.
 
 ### Video
 
-<!-- ESPACIO PARA VIDEO -->
+<!-- SPACE FOR VIDEO -->
 <video controls width="640">
   <source src="ejercicio2.mp4" type="video/mp4">
-  Tu navegador no soporta el elemento de video.
+  Your browser does not support the video element.
 </video>
-### Código
+
+### Code
 
 ```c
 #include "pico/stdlib.h"
@@ -166,28 +166,27 @@ int main(void) {
 }
 ```
 
-### Lógica utilizada
+### Logic Used
 
-Aquí `numero` no es una posición ni un índice, sino el valor real que se enciende en los LEDs: 1 (`0001`), 2 (`0010`), 4 (`0100`), 8 (`1000`). Multiplicar por 2 mueve el único bit encendido una posición hacia la izquierda en cada paso, y dividir entre 2 lo mueve una posición hacia la derecha — es la misma idea de desplazar bits, pero expresada como una operación aritmética en vez de con `<<`/`>>`.
+Here `numero` isn't a position or index — it's the actual value written to the LEDs: 1 (`0001`), 2 (`0010`), 4 (`0100`), 8 (`1000`). Multiplying by 2 shifts the single lit bit one step left; dividing by 2 shifts it one step right — same bit-shifting idea as before, just expressed arithmetically instead of with `<<`/`>>`.
 
-La bandera `subiendo` decide qué operación tocar: mientras vale 1, `numero` se va duplicando (1→2→4→8); al llegar a 8 (el extremo GPIO5), `subiendo` pasa a 0 y `numero` empieza a dividirse entre 2 (8→4→2→1); al llegar de vuelta a 1 (el extremo GPIO2), `subiendo` vuelve a 1. Ese cambio de bandera en los extremos es lo que genera el efecto de "rebote".
-
-Como siempre, `numero << 2` alinea el bit encendido con la posición física real de GPIO2–GPIO5 antes de escribirlo con `gpio_set`.
+The `subiendo` flag decides which operation runs: while it's 1, `numero` doubles (1→2→4→8); on hitting 8 (GPIO5), it flips to 0 and `numero` starts halving (8→4→2→1); on hitting 1 again (GPIO2), it flips back. That flag flip at each end is what creates the "bounce."
 
 ---
 
-## Ejercicio 3 — Animación de llenado y vaciado
+## Exercise 3 — Fill and Drain Animation
 
-Los LEDs se van encendiendo progresivamente de un lado hasta llenarse todos, y luego se van apagando progresivamente hasta vaciarse.
+LEDs light up progressively from one side until all are on, then turn off progressively until all are off.
 
 ### Video
 
-<!-- ESPACIO PARA VIDEO -->
+<!-- SPACE FOR VIDEO -->
 <video controls width="640">
   <source src="ejercicio3.mp4" type="video/mp4">
-  Tu navegador no soporta el elemento de video.
+  Your browser does not support the video element.
 </video>
-### Código
+
+### Code
 
 ```c
 #include "pico/stdlib.h"
@@ -231,28 +230,27 @@ int main(void) {
 }
 ```
 
-### Lógica utilizada
+### Logic Used
 
-En este ejercicio `numero` ya no representa un solo bit encendido (como en el ejercicio 2), sino un **bloque de bits consecutivos** que crece o se reduce. El truco está en `numero * 2 + 1`: multiplicar por 2 recorre todos los bits una posición a la izquierda, y el `+1` enciende un bit nuevo en la posición más baja. Esto hace que en cada vuelta se "prenda un LED más" empezando por GPIO2: 0 → 1 (`0001`) → 3 (`0011`) → 7 (`0111`) → 15 (`1111`).
+Here `numero` represents a **block of consecutive bits** rather than a single lit bit. The trick is `numero * 2 + 1`: multiplying by 2 shifts every bit left, and the `+1` turns on a new bit in the lowest position, so each loop "lights one more LED" starting from GPIO2: 0 → 1 (`0001`) → 3 (`0011`) → 7 (`0111`) → 15 (`1111`).
 
-Cuando `numero` llega a 15 (los 4 LEDs prendidos), la bandera `subiendo` cambia a 0 y entra la operación contraria: `numero / 2`, que recorre los bits una posición a la derecha, apagando siempre el LED más a la izquierda: 15 → 7 → 3 → 1 → 0. Al llegar a 0, `subiendo` vuelve a 1 y el ciclo se repite.
-
-Es la misma idea de rebote de los ejercicios 2 y 3 anteriores, solo que aquí la multiplicación/división no mueve un único bit, sino todo el bloque de unos a la vez.
+Once `numero` hits 15 (all 4 LEDs on), `subiendo` flips to 0 and the opposite operation kicks in: `numero / 2`, which shifts bits right, always dropping the leftmost lit LED: 15 → 7 → 3 → 1 → 0. Hitting 0 flips `subiendo` back to 1 and the cycle repeats — same bounce idea as exercise 2, but moving a whole block of bits instead of just one.
 
 ---
 
-## Ejercicio 4 — Llenado de afuera hacia adentro
+## Exercise 4 — Outside-in Fill
 
-Los LEDs se encienden empezando por los extremos hacia el centro, y luego se apagan siguiendo el mismo patrón (de afuera hacia adentro), en un ciclo continuo.
+LEDs turn on starting from the outer edges toward the center, then turn off following the same outside-in order, continuously.
 
 ### Video
 
-<!-- ESPACIO PARA VIDEO -->
+<!-- SPACE FOR VIDEO -->
 <video controls width="640">
   <source src="ejercicio4.mp4" type="video/mp4">
-  Tu navegador no soporta el elemento de video.
+  Your browser does not support the video element.
 </video>
-### Código
+
+### Code
 
 ```c
 #include "pico/stdlib.h"
@@ -294,24 +292,23 @@ int main(void) {
 }
 ```
 
-### Lógica utilizada
+### Logic Used
 
-Este patrón (`0000 → 1001 → 1111 → 0110 → 0000`) no sigue una fórmula aritmética simple como los ejercicios 1–3: los extremos (GPIO2 y GPIO5) se encienden primero, luego se completa el centro (GPIO3 y GPIO4), y al apagar se sigue el mismo orden. No hay un único `<<`, `+1` o `*2` que genere directamente esos 4 pasos.
+This pattern (`0000 → 1001 → 1111 → 0110 → 0000`) doesn't follow a simple arithmetic rule like exercises 1–3: the edges (GPIO2, GPIO5) light first, then the center fills in (GPIO3, GPIO4), and the same order applies when turning off. No single `<<`, `+1`, or `*2` produces those 4 steps directly.
 
-Por eso se arman dos máscaras fijas con `|` (OR bit a bit): `MASK_EXTREMOS` une GPIO2 y GPIO5, y `MASK_CENTRO` une GPIO3 y GPIO4. En vez de forzar los pines a un valor fijo, se usa `sio_hw->gpio_togl`, que **invierte** el estado que ya tenían los pines (si estaban en 0 pasan a 1, y viceversa). Gracias a eso, el mismo `for` de 4 pasos sirve tanto para encender como para apagar: al principio los LEDs están apagados y el toggle los prende; una vez que están todos prendidos, el mismo bloque de código los apaga en el mismo orden.
+So instead, two fixed masks are built with `|`: `MASK_EXTREMOS` combines GPIO2 and GPIO5, `MASK_CENTRO` combines GPIO3 and GPIO4. Rather than forcing pins to a fixed value, `sio_hw->gpio_togl` is used, which **flips** whatever state the pins already had. That lets the same 4-step `for` loop handle both turning on and turning off: LEDs start off and the toggle turns them on; once all are lit, the same code block turns them off in the same order.
 
-El `if (n == 0 || n == 2)` decide en qué paso del `for` le toca a los extremos y en cuál al centro: en `n = 0` y `n = 2` se aplica `MASK_EXTREMOS`, y en `n = 1` y `n = 3` se aplica `MASK_CENTRO`, alternando entre ambas máscaras en cada una de las 4 vueltas.
+`if (n == 0 || n == 2)` decides which mask applies at each step: `MASK_EXTREMOS` on `n = 0` and `n = 2`, `MASK_CENTRO` on `n = 1` and `n = 3`, alternating across the 4 iterations.
 
 ---
 
-## Conclusión
+## Conclusion
 
-Trabajar directamente con los registros del SIO permitió entender que funciones del SDK como `gpio_put()` o `gpio_set_dir()` son en realidad una capa de abstracción sobre operaciones de bits muy simples: escrituras a `gpio_set`, `gpio_clr`, `gpio_togl` y `gpio_oe_set`. Controlar 4 LEDs con una sola instrucción (usando máscaras) en lugar de manipular cada pin por separado mostró la ventaja de operar varios GPIOs de forma simultánea y eficiente.
+Working directly with the SIO registers made it clear that SDK functions like `gpio_put()` or `gpio_set_dir()` are just a thin abstraction over simple bit operations: writes to `gpio_set`, `gpio_clr`, `gpio_togl`, and `gpio_oe_set`. Controlling 4 LEDs with a single instruction (via masks) instead of handling each pin separately showed the advantage of operating several GPIOs at once, efficiently.
 
-A lo largo de los 4 ejercicios se identificaron dos estrategias distintas para generar un patrón de bits:
+Across the 4 exercises, two distinct strategies emerged for generating a bit pattern:
 
-1. **Cuando existe una regla matemática constante** (ejercicios 1, 2 y 3): el patrón se puede calcular en cada iteración con operaciones aritméticas o de desplazamiento (`<<`, `*2`, `/2`, `+1`), evitando escribir el patrón a mano.
-2. **Cuando la secuencia es arbitraria** (ejercicio 4): no existe una fórmula simple, por lo que la solución más clara es usar máscaras fijas combinadas con `gpio_togl`, aprovechando que este registro invierte el estado del pin en vez de forzarlo, lo cual permite reutilizar el mismo bloque de código tanto para encender como para apagar.
+1. **When a constant mathematical rule exists** (exercises 1, 2, 3): the pattern can be computed each iteration with arithmetic or shift operations (`<<`, `*2`, `/2`, `+1`), avoiding a hand-written pattern.
+2. **When the sequence is arbitrary** (exercise 4): no simple formula exists, so the clearest solution is fixed masks combined with `gpio_togl`, taking advantage of the fact that this register flips the pin's state instead of forcing it — letting the same code block serve for both turning on and off.
 
-En general, la actividad reforzó la importancia de entender el hardware por debajo del SDK: saber qué bit del registro corresponde a qué pin físico es la base para poder diseñar cualquier patrón de control de GPIOs, sin depender únicamente de las funciones de alto nivel.
-
+Overall, the activity reinforced how important it is to understand the hardware beneath the SDK: knowing which register bit maps to which physical pin is the foundation for designing any GPIO control pattern, without relying solely on high-level functions.
