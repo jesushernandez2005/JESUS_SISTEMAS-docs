@@ -29,11 +29,10 @@ GPIO2 → LED → 220Ω resistor → GND
 GPIO6 → Button A → GND     (internal pull-down)
 GPIO7 → Button B → GND     (internal pull-down)
 ```
-
-<!-- SPACE FOR CIRCUIT DIAGRAM IMAGE (AND/OR/XOR) -->
-
-**Moving LED** (4 output LEDs, two input buttons):
-
+![Diagrama de circuito AND/OR/XOR](esquematico.jpg)
+/// caption
+Diagrama de conexión para las compuertas AND, OR y XOR
+///
 ```
 GPIO2 → LED0 → 220Ω resistor → GND
 GPIO3 → LED1 → 220Ω resistor → GND
