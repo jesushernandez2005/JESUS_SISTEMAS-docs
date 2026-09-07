@@ -59,10 +59,13 @@ The 4 LEDs represent a binary number counting from `0000` to `1111` (0 to 15), r
 ### Video
 
 <!-- SPACE FOR VIDEO -->
-<video controls width="640">
-  <source src="ejercicio1.mp4" type="video/mp4">
-  Your browser does not support the video element.
-</video>
+<iframe width="640" height="360" 
+  src="https://youtube.com/shorts/K7jKG_uqHXw?si=jHdKx_hQ5cUBY4t9" 
+  title="EJERCICIO_1" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+  allowfullscreen>
+</iframe>
 
 ### Code
 
@@ -117,10 +120,13 @@ A single lit LED that moves from one end of the array to the other and back, con
 ### Video
 
 <!-- SPACE FOR VIDEO -->
-<video controls width="640">
-  <source src="ejercicio2.mp4" type="video/mp4">
-  Your browser does not support the video element.
-</video>
+<iframe width="640" height="360" 
+  src="https://youtube.com/shorts/SKljldsNEv0?si=P1q_SWlPBcciRE_c" 
+  title="EJERCICIO_2" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+  allowfullscreen>
+</iframe>
 
 ### Code
 
@@ -181,10 +187,13 @@ LEDs light up progressively from one side until all are on, then turn off progre
 ### Video
 
 <!-- SPACE FOR VIDEO -->
-<video controls width="640">
-  <source src="ejercicio3.mp4" type="video/mp4">
-  Your browser does not support the video element.
-</video>
+<iframe width="640" height="360" 
+  src="https://youtube.com/shorts/_psb46dYPCc?si=sW8lfIzUncVOYMYw" 
+  title="EJERCICIO_3" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+  allowfullscreen>
+</iframe>
 
 ### Code
 
@@ -245,10 +254,13 @@ LEDs turn on starting from the outer edges toward the center, then turn off foll
 ### Video
 
 <!-- SPACE FOR VIDEO -->
-<video controls width="640">
-  <source src="ejercicio4.mp4" type="video/mp4">
-  Your browser does not support the video element.
-</video>
+<iframe width="640" height="360" 
+  src="https://youtube.com/shorts/gKS8zamVWCE?si=05tgUziXsB-EglEn" 
+  title="EJERCICIO_4" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+  allowfullscreen>
+</iframe>
 
 ### Code
 
