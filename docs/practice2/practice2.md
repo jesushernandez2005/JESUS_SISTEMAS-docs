@@ -113,7 +113,7 @@ Checking each button bit separately inside the `if` (`entaadas & 1<<6 && entaada
 
 <!-- AND -->
 <iframe width="640" height="360" 
-  src="https://www.youtube.com/embed/iVDNHh9myGY" 
+  src="https://www.youtube.com/watch?v=iVDNHh9myGY" 
   title="AND" 
   frameborder="0" 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -187,7 +187,7 @@ Going from AND to OR here just meant switching the condition back to checking th
 
 <!-- OR -->
 <iframe width="640" height="360" 
-  src="https://www.youtube.com/embed/9c4pL6IqUuc" 
+  src="https://www.youtube.com/watch?v=9c4pL6IqUuc" 
   title="OR" 
   frameborder="0" 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -262,7 +262,7 @@ XOR needed a different approach than AND/OR since no single mask value captures 
 
 <!-- XOR -->
 <iframe width="640" height="360" 
-  src="https://www.youtube.com/embed/gAFcZZhO4N4" 
+  src="https://www.youtube.com/watch?v=gAFcZZhO4N4" 
   title="XOR" 
   frameborder="0" 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -352,7 +352,7 @@ Switching from a blocking `while (gpio_get(...))` to a press/release flag per bu
 <!-- SPACE FOR VIDEO -->
 <!-- Moving LED -->
 <iframe width="640" height="360" 
-  src="https://www.youtube.com/embed/ynnhtEI6nR8" 
+  src="https://www.youtube.com/watch?v=gAFcZZhO4N4" 
   title="Moving LED" 
   frameborder="0" 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
