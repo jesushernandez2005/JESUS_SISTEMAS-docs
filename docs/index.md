@@ -50,8 +50,8 @@ This section will contain the different laboratory practices completed throughou
 
 | Practice | Description | Status |
 |---|---|---|
-| [Practice 1](practice1/practice1.md) | GPIO: from SDK functions to hardware registers (RP2350 SIO) | 🟢 In Progress |
-| Practice 2 | To be added | ⚪ Pending |
+| [Practice 1](practice1/practice1.md) | GPIO: from SDK functions to hardware registers (RP2350 SIO) | 🟢 Complete |
+| [Practice 2](practice2/practice2.md) | Buttons and Logic Gates with GPIO (RP2350) | 🟢 Complete |
 | Practice 3 | To be added | ⚪ Pending |
 
 ---
