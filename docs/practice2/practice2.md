@@ -111,9 +111,9 @@ The LED stays off unless both buttons are held down together; releasing either o
 
 Checking each button bit separately inside the `if` (`entaadas & 1<<6 && entaadas & 1<<7`) works just as well as comparing against a full mask, and reads a bit closer to plain logical AND. Adding the `printf` made it easy to confirm what the register was actually reading before trusting the LED's behavior.
 
-<!-- SPACE FOR VIDEO -->
+<!-- AND -->
 <iframe width="640" height="360" 
-  src="https://youtube.com/shorts/iVDNHh9myGY?si=3hQmrIOXtUdMhfzh" 
+  src="https://www.youtube.com/embed/iVDNHh9myGY" 
   title="AND" 
   frameborder="0" 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -185,9 +185,9 @@ Pressing either button (or both) lights the LED; it's off only when neither is p
 
 Going from AND to OR here just meant switching the condition back to checking the combined mask instead of both bits individually — same register read, different comparison.
 
-<!-- SPACE FOR VIDEO -->
+<!-- OR -->
 <iframe width="640" height="360" 
-  src="https://youtube.com/shorts/9c4pL6IqUuc?si=u1CP0JWp7g27NYB7" 
+  src="https://www.youtube.com/embed/9c4pL6IqUuc" 
   title="OR" 
   frameborder="0" 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -260,9 +260,9 @@ The LED lights up for A-only or B-only, and stays off when both or neither are p
 
 XOR needed a different approach than AND/OR since no single mask value captures both valid combinations — separating the bits into `a` and `b` and using `^` was the simplest match for its truth table.
 
-<!-- SPACE FOR VIDEO -->
+<!-- XOR -->
 <iframe width="640" height="360" 
-  src="https://youtube.com/shorts/gAFcZZhO4N4?si=jSUfTNsC6RAciHzm" 
+  src="https://www.youtube.com/embed/gAFcZZhO4N4" 
   title="XOR" 
   frameborder="0" 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -350,9 +350,10 @@ The LED shifts one step per press in either direction, and instead of stopping a
 Switching from a blocking `while (gpio_get(...))` to a press/release flag per button (`f1`, `f2`) achieves the same single-step-per-press behavior without freezing the main loop, and made it straightforward to add wrap-around instead of clamping at the edges.
 
 <!-- SPACE FOR VIDEO -->
+<!-- Moving LED -->
 <iframe width="640" height="360" 
-  src="https://youtube.com/shorts/ynnhtEI6nR8?si=VucNz5G02vOk3Q6N" 
-  title="TOY" 
+  src="https://www.youtube.com/embed/ynnhtEI6nR8" 
+  title="Moving LED" 
   frameborder="0" 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
   allowfullscreen>
