@@ -113,7 +113,7 @@ Checking each button bit separately inside the `if` (`entaadas & 1<<6 && entaada
 
 <!-- SPACE FOR VIDEO -->
 <video controls width="640">
-  <source src="AND.mp4" type="video/mp4">
+  <source src="And2.mp4" type="video/mp4">
   Your browser does not support the video element.
 </video>
 
