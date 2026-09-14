@@ -44,94 +44,77 @@ Unlike the logic-gate exercises, both buttons here use the microcontroller's int
 #include "hardware/gpio.h"
 #include <stdio.h>
 
-// Pines donde están conectados los botones
-#define BOTON_PIN 7      // Botón para "ganar" / reiniciar
-#define BOTON_PIN2 8     // Botón para cambiar la velocidad
 
-// Máscara para prender/apagar los 5 LEDs de un solo golpe
-// Los LEDs están en GPIO 2,3,4,5,6 -> bits 2 al 6 encendidos
-const uint32_t MASK_LED = 0x1F << 2; // 0b01111100
+#define BOTON_PIN 7      
+#define BOTON_PIN2 8     
 
-// Variables "compartidas" entre el loop principal y las interrupciones.
-// volatile = "oye compilador, esto puede cambiar en cualquier momento
-// por fuera del código normal, no la guardes en caché, léela siempre de la RAM"
-volatile bool gane = false;   // true = ya ganaste, LEDs parpadeando
-volatile int counter = 0;     // qué LED está prendido ahorita (0 a 4)
-volatile int vel = 500;       // qué tan rápido se prenden los LEDs (ms)
 
-// ---------------------------------------------------------
-// Esta función se ejecuta SOLO cuando se presiona BOTON_PIN
-// ---------------------------------------------------------
+const uint32_t MASK_LED = 0x1F << 2; 
+
+
+volatile bool gane = false;   
+volatile int counter = 0;     
+volatile int vel = 500;       
+
+
 void stop_callback(uint gpio, uint32_t events)
 {
-    // Doble chequeo: que sí sea el botón correcto Y que sí sea
-    // el evento correcto (flanco de subida, o sea, se soltó)
+    
     if (gpio == BOTON_PIN && (events & GPIO_IRQ_EDGE_RISE))
     {
         printf("Botón de ganar presionado\n");
 
-        if (!gane) // si todavía NO habíamos ganado...
+        if (!gane) 
         {
-            // counter == 2 significa que el LED de en medio (GPIO 4)
-            // es el que está prendido en este instante
+            
             if (counter == 2)
             {
                 printf("¡Ganaste! Empieza el parpadeo\n");
-                gane = true; // avisamos al loop principal que ya ganamos
+                gane = true; 
             }
             else
             {
-                // No era el LED de en medio, no pasa nada,
-                // el juego sigue como si nada
+               
                 printf("Fallaste, sigue jugando\n");
             }
         }
-        else // si ya habíamos ganado antes...
+        else 
         {
             printf("Reiniciando el juego\n");
-            gane = false;   // regresamos al modo normal (ruleta)
-            counter = 0;    // reiniciamos desde el primer LED
+            gane = false;   
+            counter = 0;    
         }
     }
 
-    // OBLIGATORIO: le decimos al hardware "ya atendí esta interrupción,
-    // bájale la bandera". Si no lo haces, se vuelve a disparar sola.
+   
     gpio_acknowledge_irq(gpio, events);
 }
 
-// ---------------------------------------------------------
-// Esta función se ejecuta SOLO cuando se presiona BOTON_PIN2
-// ---------------------------------------------------------
+
 void boton_velocidad(uint gpio, uint32_t events)
 {
     if (gpio == BOTON_PIN2 && (events & GPIO_IRQ_EDGE_RISE))
     {
         printf("Botón de velocidad presionado\n");
 
-        // Vamos rotando entre 3 velocidades: 500 -> 250 -> 100 -> 500...
+    
         if (vel == 500)
         {
-            vel = 250; // más rápido
+            vel = 250; 
         }
         else if (vel == 250)
         {
-            vel = 100; // más rápido todavía
+            vel = 100; 
         }
         else if (vel == 100)
         {
-            vel = 500; // regresamos a lento
+            vel = 500; 
         }
     }
 
-    gpio_acknowledge_irq(gpio, events); // mismo trámite de siempre
+    gpio_acknowledge_irq(gpio, events); 
 }
 
-// ---------------------------------------------------------
-// El Pico SDK solo permite UN callback global de interrupciones
-// de GPIO. Por eso esta función actúa como "recepcionista":
-// revisa QUÉ pin mandó la interrupción y manda la llamada
-// a la función correcta.
-// ---------------------------------------------------------
 void escoge_boton(uint gpio, uint32_t events)
 {
     if (gpio == BOTON_PIN)
@@ -146,9 +129,9 @@ void escoge_boton(uint gpio, uint32_t events)
 
 int main(void)
 {
-    stdio_init_all(); // para que funcione el printf por USB/serial
+    stdio_init_all(); 
 
-    // Inicializamos cada pin que vamos a usar
+    
     gpio_init(2);
     gpio_init(3);
     gpio_init(4);
@@ -157,10 +140,10 @@ int main(void)
     gpio_init(BOTON_PIN);
     gpio_init(BOTON_PIN2);
 
-    // Los 5 LEDs son SALIDAS (el Pico manda voltaje hacia ellos)
+ 
     sio_hw->gpio_oe_set = MASK_LED;
 
-    // Los botones son ENTRADAS (el Pico solo lee su estado)
+   
     sio_hw->gpio_oe_clr = (1u << BOTON_PIN) | (1u << BOTON_PIN2);
 
     // Pull-up: el pin normalmente está en "1" (alto), y baja a "0"
@@ -168,42 +151,36 @@ int main(void)
     gpio_pull_up(BOTON_PIN);
     gpio_pull_up(BOTON_PIN2);
 
-    // Aquí registramos la ÚNICA función que atiende TODAS las
-    // interrupciones de GPIO, y de paso activamos la interrupción
-    // del primer botón
+    
     gpio_set_irq_enabled_with_callback(BOTON_PIN, GPIO_IRQ_EDGE_RISE, true, &escoge_boton);
 
-    // El segundo botón solo necesita "prenderse", ya que el
-    // callback global ya quedó registrado arriba
+    
     gpio_set_irq_enabled(BOTON_PIN2, GPIO_IRQ_EDGE_RISE, true);
 
-    // ---------------------------------------------------------
-    // Loop principal: aquí vive la "ruleta" de LEDs
-    // ---------------------------------------------------------
+    
     while (true)
     {
         if (gane)
         {
-            // Modo "ganaste": todos los LEDs parpadean juntos
-            sio_hw->gpio_set = MASK_LED; // prende los 5 LEDs
+            
+            sio_hw->gpio_set = MASK_LED; 
             sleep_ms(200);
-            sio_hw->gpio_clr = MASK_LED; // apaga los 5 LEDs
+            sio_hw->gpio_clr = MASK_LED; 
             sleep_ms(200);
-            // Este ciclo se repite solito hasta que el botón
-            // vuelva a poner gane = false
+            
         }
         else
         {
-            // Modo normal: la ruleta va prendiendo un LED a la vez
-            sio_hw->gpio_clr = MASK_LED;              // apaga todos primero
-            sio_hw->gpio_set = (1u << (2 + counter));  // prende solo el LED actual
-            sleep_ms(vel);                             // espera según la velocidad
+           
+            sio_hw->gpio_clr = MASK_LED;             
+            sio_hw->gpio_set = (1u << (2 + counter));  
+            sleep_ms(vel);                             
 
             printf("GPIO: %d \n", sio_hw->gpio_in);
 
-            counter++;          // pasamos al siguiente LED
-            if (counter > 4)    // si ya llegamos al último (GPIO 6)...
-                counter = 0;    // ...regresamos al primero (GPIO 2)
+            counter++;          
+            if (counter > 4)   
+                counter = 0;    
         }
     }
 }
@@ -226,7 +203,7 @@ The LED sequence runs as a continuous roulette. Pressing the win button while th
 <!-- SPACE FOR VIDEO -->
 <!-- LED Roulette -->
 <iframe width="640" height="360"
-  src=""
+  src="https://youtube.com/shorts/uBzF-U9Sklg?si=Dd2gspID02_qHoQ1"
   title="LED Roulette"
   frameborder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
