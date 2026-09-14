@@ -8,7 +8,7 @@ tags: [embedded-systems, raspberry-pi-pico-2, gpio, registers, sio, c]
 
 ## Context
 
-This activity worked with the RP2350's **SIO (Single-Cycle I/O)** block to understand what `gpio_put()` actually does at the hardware level. Starting from an SDK-based blink, it was rewritten using registers (`sio_hw->gpio_set`, `sio_hw->gpio_clr`, `sio_hw->gpio_oe_set`, etc.), then applied to solve 4 exercises with 4 LEDs on GPIO2–GPIO5, driving the registers directly with bitmasks.
+This activity used the RP2350's **SIO (Single-Cycle I/O)** block to see what `gpio_put()` actually does at the hardware level. Starting from a normal SDK blink, I rewrote it using registers directly (`sio_hw->gpio_set`, `sio_hw->gpio_clr`, `sio_hw->gpio_oe_set`, etc.), then used that to solve 4 exercises with 4 LEDs on GPIO2–GPIO5, driving the registers with bitmasks.
 
 **Hardware connection:**
 
@@ -23,7 +23,7 @@ GPIO5 → LED3 → resistor → GND
 
 ## Objective
 
-Understand how the Raspberry Pi Pico SDK translates high-level functions (`gpio_put`, `gpio_set_dir`, etc.) into direct writes to the SIO peripheral's registers, and use that to drive 4 LEDs with bitmasks, producing different animation patterns (binary counter, bouncing light, progressive fill/drain, and outside-in fill).
+Understand how the Raspberry Pi Pico SDK turns high-level functions (`gpio_put`, `gpio_set_dir`, etc.) into direct writes to the SIO registers, and use that to drive 4 LEDs with bitmasks in 4 different animations: binary counter, bouncing light, fill/drain, and outside-in fill.
 
 ## Materials and Components
 
@@ -36,7 +36,7 @@ Understand how the Raspberry Pi Pico SDK translates high-level functions (`gpio_
 
 ## Circuit Diagram
 
-The physical connection is the same for all 4 exercises; only the code controlling the pins changes. Each LED is wired in series with its resistor between the corresponding GPIO and GND:
+The physical connection is the same for all 4 exercises; only the code changes. Each LED goes in series with its resistor between the GPIO and GND:
 
 ```
 GPIO2 → LED0 → 220Ω resistor → GND
@@ -48,13 +48,13 @@ GPIO5 → LED3 → 220Ω resistor → GND
 <!-- SPACE FOR CIRCUIT DIAGRAM IMAGE -->
 ![4-LED connection diagram](conexion_leds.svg)
 
-The LED's long leg (anode) goes to the resistor/GPIO side, and the short leg (cathode) goes to the GND rail.
+The LED's long leg (anode) goes to the resistor/GPIO side, and the short leg (cathode) goes to GND.
 
 ---
 
 ## Exercise 1 — 4-bit Binary Counter
 
-The 4 LEDs represent a binary number counting from `0000` to `1111` (0 to 15), repeating.
+The 4 LEDs show a binary number counting from `0000` to `1111` (0 to 15), then repeat.
 
 ### Video
 
@@ -105,17 +105,17 @@ int main(void) {
 }
 ```
 
-### Logic Used
+### How it works
 
-`sumador` is the decimal counter (0 to 15). Since GPIO2 is the first physical pin used, not bit 0 of the register, its value has to be shifted left 2 places (`sumador << 2`) so its 4 bits land exactly on GPIO2–GPIO5, stored in `numero_binario`.
+`sumador` is a normal decimal counter, 0 to 15. Since GPIO2 is the first pin used and not bit 0 of the register, I shift the value left by 2 (`sumador << 2`) so its 4 bits land exactly on GPIO2–GPIO5, saved in `numero_binario`.
 
-Each loop first clears the whole group (`gpio_clr = MASK`, avoiding leftover bits from the previous number), then sets only the current number's bits (`gpio_set = numero_binario`). `sumador++` advances the count, and `if (sumador > 15) sumador = 0` wraps it back to zero once it exceeds what 4 bits can hold.
+Each loop first clears all 4 pins (`gpio_clr = MASK`, so nothing from the last number stays on), then turns on only the current number's bits (`gpio_set = numero_binario`). `sumador++` moves the count forward, and once it goes past 15 it resets to 0, since that's the max 4 bits can hold.
 
 ---
 
 ## Exercise 2 — Bouncing Light
 
-A single lit LED that moves from one end of the array to the other and back, continuously.
+A single LED moves from one end of the row to the other and back, over and over.
 
 ### Video
 
@@ -172,17 +172,17 @@ int main(void) {
 }
 ```
 
-### Logic Used
+### How it works
 
-Here `numero` isn't a position or index — it's the actual value written to the LEDs: 1 (`0001`), 2 (`0010`), 4 (`0100`), 8 (`1000`). Multiplying by 2 shifts the single lit bit one step left; dividing by 2 shifts it one step right — same bit-shifting idea as before, just expressed arithmetically instead of with `<<`/`>>`.
+`numero` here isn't a counter, it's the actual value sent to the LEDs: 1 (`0001`), 2 (`0010`), 4 (`0100`), 8 (`1000`). Multiplying by 2 moves the single lit bit one step left, dividing by 2 moves it one step right — same shifting idea as before, just written with math instead of `<<`/`>>`.
 
-The `subiendo` flag decides which operation runs: while it's 1, `numero` doubles (1→2→4→8); on hitting 8 (GPIO5), it flips to 0 and `numero` starts halving (8→4→2→1); on hitting 1 again (GPIO2), it flips back. That flag flip at each end is what creates the "bounce."
+The `subiendo` flag decides which one runs: while it's 1, `numero` keeps doubling (1→2→4→8); at 8 (GPIO5) it flips to 0 and starts halving instead (8→4→2→1); at 1 again (GPIO2) it flips back to 1. That flip at each end is what makes it bounce.
 
 ---
 
 ## Exercise 3 — Fill and Drain Animation
 
-LEDs light up progressively from one side until all are on, then turn off progressively until all are off.
+LEDs turn on one by one from one side until all 4 are lit, then turn off one by one until none are lit.
 
 ### Video
 
@@ -239,17 +239,17 @@ int main(void) {
 }
 ```
 
-### Logic Used
+### How it works
 
-Here `numero` represents a **block of consecutive bits** rather than a single lit bit. The trick is `numero * 2 + 1`: multiplying by 2 shifts every bit left, and the `+1` turns on a new bit in the lowest position, so each loop "lights one more LED" starting from GPIO2: 0 → 1 (`0001`) → 3 (`0011`) → 7 (`0111`) → 15 (`1111`).
+Here `numero` represents a **block of bits**, not just one lit LED. The key line is `numero * 2 + 1`: multiplying by 2 shifts every bit left, and `+1` turns on a new bit at the bottom, so each loop lights one more LED starting from GPIO2: 0 → 1 (`0001`) → 3 (`0011`) → 7 (`0111`) → 15 (`1111`).
 
-Once `numero` hits 15 (all 4 LEDs on), `subiendo` flips to 0 and the opposite operation kicks in: `numero / 2`, which shifts bits right, always dropping the leftmost lit LED: 15 → 7 → 3 → 1 → 0. Hitting 0 flips `subiendo` back to 1 and the cycle repeats — same bounce idea as exercise 2, but moving a whole block of bits instead of just one.
+Once `numero` hits 15 (all 4 on), `subiendo` flips to 0 and the code switches to `numero / 2`, which shifts bits right and drops the leftmost lit LED each time: 15 → 7 → 3 → 1 → 0. Hitting 0 flips `subiendo` back to 1 and it repeats — same bounce idea as exercise 2, just with a whole block of bits instead of one.
 
 ---
 
 ## Exercise 4 — Outside-in Fill
 
-LEDs turn on starting from the outer edges toward the center, then turn off following the same outside-in order, continuously.
+LEDs turn on starting from the outer edges and move toward the center, then turn off in the same outside-in order, on repeat.
 
 ### Video
 
@@ -304,23 +304,23 @@ int main(void) {
 }
 ```
 
-### Logic Used
+### How it works
 
-This pattern (`0000 → 1001 → 1111 → 0110 → 0000`) doesn't follow a simple arithmetic rule like exercises 1–3: the edges (GPIO2, GPIO5) light first, then the center fills in (GPIO3, GPIO4), and the same order applies when turning off. No single `<<`, `+1`, or `*2` produces those 4 steps directly.
+This pattern (`0000 → 1001 → 1111 → 0110 → 0000`) doesn't follow a simple math rule like the other exercises: the edges (GPIO2, GPIO5) light first, then the center (GPIO3, GPIO4) fills in, and turning off follows the same order. No `<<`, `+1`, or `*2` gets you those 4 steps directly.
 
-So instead, two fixed masks are built with `|`: `MASK_EXTREMOS` combines GPIO2 and GPIO5, `MASK_CENTRO` combines GPIO3 and GPIO4. Rather than forcing pins to a fixed value, `sio_hw->gpio_togl` is used, which **flips** whatever state the pins already had. That lets the same 4-step `for` loop handle both turning on and turning off: LEDs start off and the toggle turns them on; once all are lit, the same code block turns them off in the same order.
+So instead I built two fixed masks with `|`: `MASK_EXTREMOS` covers GPIO2 and GPIO5, `MASK_CENTRO` covers GPIO3 and GPIO4. Instead of forcing pins to a value, I use `sio_hw->gpio_togl`, which just **flips** whatever state the pins already had. That means the same 4-step `for` loop handles both turning on and turning off: LEDs start off and the toggle turns them on, and once all are lit the same code turns them off in the same order.
 
-`if (n == 0 || n == 2)` decides which mask applies at each step: `MASK_EXTREMOS` on `n = 0` and `n = 2`, `MASK_CENTRO` on `n = 1` and `n = 3`, alternating across the 4 iterations.
+`if (n == 0 || n == 2)` picks which mask to use at each step: `MASK_EXTREMOS` on `n = 0` and `n = 2`, `MASK_CENTRO` on `n = 1` and `n = 3`, alternating over the 4 steps.
 
 ---
 
 ## Conclusion
 
-Working directly with the SIO registers made it clear that SDK functions like `gpio_put()` or `gpio_set_dir()` are just a thin abstraction over simple bit operations: writes to `gpio_set`, `gpio_clr`, `gpio_togl`, and `gpio_oe_set`. Controlling 4 LEDs with a single instruction (via masks) instead of handling each pin separately showed the advantage of operating several GPIOs at once, efficiently.
+Working with the SIO registers directly made it clear that SDK functions like `gpio_put()` or `gpio_set_dir()` are just a thin layer over simple bit operations: writes to `gpio_set`, `gpio_clr`, `gpio_togl`, and `gpio_oe_set`. Controlling all 4 LEDs with one instruction using masks, instead of handling each pin one at a time, showed why it's useful to operate several GPIOs at once.
 
-Across the 4 exercises, two distinct strategies emerged for generating a bit pattern:
+Across the 4 exercises, I ended up using two different strategies to build a bit pattern:
 
-1. **When a constant mathematical rule exists** (exercises 1, 2, 3): the pattern can be computed each iteration with arithmetic or shift operations (`<<`, `*2`, `/2`, `+1`), avoiding a hand-written pattern.
-2. **When the sequence is arbitrary** (exercise 4): no simple formula exists, so the clearest solution is fixed masks combined with `gpio_togl`, taking advantage of the fact that this register flips the pin's state instead of forcing it — letting the same code block serve for both turning on and off.
+1. **When there's a simple math rule** (exercises 1, 2, 3): the pattern can be calculated each loop with shifts or arithmetic (`<<`, `*2`, `/2`, `+1`), no need to hardcode each step.
+2. **When the sequence is arbitrary** (exercise 4): there's no formula for it, so fixed masks plus `gpio_togl` is the cleanest option, since toggling flips the pin instead of forcing a value — letting one code block handle both turning on and off.
 
-Overall, the activity reinforced how important it is to understand the hardware beneath the SDK: knowing which register bit maps to which physical pin is the foundation for designing any GPIO control pattern, without relying solely on high-level functions.
+Overall, this activity showed how important it is to understand the hardware under the SDK: knowing which register bit maps to which physical pin is the base for building any GPIO pattern, instead of just relying on high-level functions.

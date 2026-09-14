@@ -52,7 +52,7 @@ This section will contain the different laboratory practices completed throughou
 |---|---|---|
 | [Practice 1](practice1/practice1.md) | GPIO: from SDK functions to hardware registers (RP2350 SIO) | 🟢 Complete |
 | [Practice 2](practice2/practice2.md) | Buttons and Logic Gates with GPIO (RP2350) | 🟢 Complete |
-| [Practice 2](practice3/practice3.md) | LED Roulette with Interrupts (RP2350) (RP2350) | 🟢 Complete |
+| [Practice 3](practice3/practice3.md) | LED Roulette with Interrupts (RP2350) (RP2350) | 🟢 Complete |
 
 ---
 

@@ -34,7 +34,7 @@ GPIO8 → Button 2 (speed)         → GND   (internal pull-up)
 
 <!-- SPACE FOR CIRCUIT DIAGRAM IMAGE -->
 
-Unlike the previous logic-gate exercises, both buttons here rely on the microcontroller's internal **pull-up** (`gpio_pull_up()`), so each pin reads `1` when unpressed and drops to `0` when pressed — the interrupt is configured on `GPIO_IRQ_EDGE_RISE`, so it fires the instant the button is released back up.
+Unlike the logic-gate exercises, both buttons here use the microcontroller's internal **pull-up** (`gpio_pull_up()`), so each pin reads `1` when not pressed and drops to `0` when pressed. The interrupt is set on `GPIO_IRQ_EDGE_RISE`, so it fires the moment the button is released back up.
 
 ## Source Code
 
@@ -209,19 +209,19 @@ int main(void)
 }
 ```
 
-## System Operation
+## How it works
 
-The roulette itself is simple polling in the main loop: `counter` walks from 0 to 4, redrawn each pass with `1u << (2 + counter)` to light exactly one of GPIO2–GPIO6, and the delay between steps is set by the shared `vel` variable. What makes this activity different from the earlier logic-gate and moving-LED labs is that the buttons are no longer read by polling `gpio_in` inside the loop — they're handled by hardware interrupts.
+The roulette itself is plain polling in the main loop: `counter` goes from 0 to 4, redrawn every pass with `1u << (2 + counter)` to light exactly one LED on GPIO2–GPIO6, and the delay between steps comes from the shared `vel` variable. What's different from the earlier labs is that the buttons aren't read by polling `gpio_in` anymore — they're handled with hardware interrupts.
 
-Only one callback can be registered globally for GPIO interrupts (`gpio_set_irq_enabled_with_callback`), so `escoge_boton` acts as a router: it checks which `gpio` triggered the interrupt and forwards it to `stop_callback` or `boton_velocidad`. The second button is added afterward with a plain `gpio_set_irq_enabled`, since the callback is already registered.
+The Pico SDK only lets you register one global callback for GPIO interrupts (`gpio_set_irq_enabled_with_callback`), so `escoge_boton` works as a router: it checks which `gpio` fired and forwards it to `stop_callback` or `boton_velocidad`. The second button is added afterward with a plain `gpio_set_irq_enabled`, since the callback is already set.
 
-`stop_callback` only sets `gane = true` if `counter == 2` at the moment the button is pressed — that's the middle LED (GPIO4). If a different LED was lit, nothing happens and the roulette keeps running. If the game was already won, the same button press resets `gane` to `false` and `counter` back to `0`, restarting the roulette. `boton_velocidad` just rotates `vel` through 500 → 250 → 100 ms on every press.
+`stop_callback` only sets `gane = true` if `counter == 2` at the moment the button is pressed — that's the middle LED (GPIO4). If a different LED was on, nothing happens and the roulette keeps going. If the game was already won, pressing the same button resets `gane` to `false` and `counter` to `0`, restarting the roulette. `boton_velocidad` just cycles `vel` through 500 → 250 → 100 ms on every press.
 
-All three shared variables (`gane`, `counter`, `vel`) are declared `volatile`, since they're written inside an ISR and read inside `main()`'s loop — without it the compiler could cache their value and never notice the change made by an interrupt. Every callback also calls `gpio_acknowledge_irq()` at the end, which is required to clear the interrupt flag in hardware; skipping it leaves the pin "stuck" re-firing the same interrupt.
+All three shared variables (`gane`, `counter`, `vel`) are marked `volatile`, since they get written inside an interrupt and read inside `main()`'s loop — without `volatile` the compiler could cache their value and miss the change made by the interrupt. Every callback also calls `gpio_acknowledge_irq()` at the end, which clears the interrupt flag in hardware; skipping it leaves the pin stuck re-firing the same interrupt.
 
 ## Results
 
-The LED sequence runs continuously as a roulette. Pressing the win button while the middle LED (GPIO4) is lit switches the board into a synchronized blink of all 5 LEDs; pressing it again while blinking resets the game and the roulette starts over from the first LED. Pressing the win button while any other LED is lit has no visible effect. The speed button reliably cycles the roulette through slow, medium, and fast steps on each press, independent of whether the game is currently won or running.
+The LED sequence runs as a continuous roulette. Pressing the win button while the middle LED (GPIO4) is lit switches all 5 LEDs into a synchronized blink; pressing it again while blinking resets the game and the roulette starts over from the first LED. Pressing the win button while any other LED is lit does nothing. The speed button reliably cycles the roulette through slow, medium, and fast on each press, whether the game is currently won or running.
 
 <!-- SPACE FOR VIDEO -->
 <!-- LED Roulette -->
@@ -235,4 +235,4 @@ The LED sequence runs continuously as a roulette. Pressing the win button while 
 
 ## Conclusions
 
-Moving from polling (as in the earlier moving-LED lab, which used flags `f1`/`f2` to detect a single press inside the main loop) to interrupts meant the main loop no longer has to check button state at all — it just reacts to `gane` and `vel` whenever they get updated. This also made a subtlety obvious: because only one callback can be registered per core, a router function is needed to dispatch by pin, and every shared variable between the ISR and `main()` has to be `volatile` or the change may never be seen outside the interrupt. The activity also surfaced a limitation not yet solved here — without software debounce, a single physical press can occasionally register as more than one edge, which would need a time-based filter (e.g. comparing against `time_us_32()`) to fix properly.
+Moving from polling (like the moving-LED lab, which used flags `f1`/`f2` to catch a single press inside the main loop) to interrupts meant the main loop doesn't have to check button state at all anymore — it just reacts to `gane` and `vel` whenever they change. This also made something clear: since only one callback can be registered per core, I needed a router function to dispatch by pin, and any variable shared between an interrupt and `main()` has to be `volatile` or the change might never show up outside the interrupt. One thing this activity didn't solve yet: without software debounce, a single physical press can sometimes register as more than one edge, which would need a time-based check (like comparing against `time_us_32()`) to fix properly.
