@@ -59,13 +59,9 @@ The 4 LEDs show a binary number counting from `0000` to `1111` (0 to 15), then r
 ### Video
 
 <!-- SPACE FOR VIDEO -->
-<iframe width="640" height="360" 
-  src="https://youtube.com/shorts/K7jKG_uqHXw?si=jHdKx_hQ5cUBY4t9" 
-  title="EJERCICIO_1" 
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-  allowfullscreen>
-</iframe>
+<video controls width="640" height="360">
+  <source src="ejercicio1.mp4" type="ejercicio1/mp4">
+</video>
 
 ### Code
 
@@ -120,13 +116,10 @@ A single LED moves from one end of the row to the other and back, over and over.
 ### Video
 
 <!-- SPACE FOR VIDEO -->
-<iframe width="640" height="360" 
-  src="https://youtube.com/shorts/SKljldsNEv0?si=P1q_SWlPBcciRE_c" 
-  title="EJERCICIO_2" 
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-  allowfullscreen>
-</iframe>
+<video controls width="640" height="360">
+  <source src="ejercicio2.mp4" type="ejercicio2/mp4">
+</video>
+
 
 ### Code
 
@@ -187,13 +180,10 @@ LEDs turn on one by one from one side until all 4 are lit, then turn off one by 
 ### Video
 
 <!-- SPACE FOR VIDEO -->
-<iframe width="640" height="360" 
-  src="https://youtube.com/shorts/_psb46dYPCc?si=sW8lfIzUncVOYMYw" 
-  title="EJERCICIO_3" 
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-  allowfullscreen>
-</iframe>
+<video controls width="640" height="360">
+  <source src="ejercicio3.mp4" type="ejercicio3/mp4">
+</video>
+
 
 ### Code
 
@@ -254,13 +244,10 @@ LEDs turn on starting from the outer edges and move toward the center, then turn
 ### Video
 
 <!-- SPACE FOR VIDEO -->
-<iframe width="640" height="360" 
-  src="https://youtube.com/shorts/gKS8zamVWCE?si=05tgUziXsB-EglEn" 
-  title="EJERCICIO_4" 
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-  allowfullscreen>
-</iframe>
+<video controls width="640" height="360">
+  <source src="ejercicio4.mp4" type="ejercicio4/mp4">
+</video>
+
 
 ### Code
 
