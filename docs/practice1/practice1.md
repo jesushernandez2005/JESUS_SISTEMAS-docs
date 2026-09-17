@@ -46,7 +46,7 @@ GPIO5 → LED3 → 220Ω resistor → GND
 ```
 
 <!-- SPACE FOR CIRCUIT DIAGRAM IMAGE -->
-![4-LED connection diagram](conexion_leds.svg)
+<img src="4leds.jpg" alt="4-LED connection diagram" width="640">
 
 The LED's long leg (anode) goes to the resistor/GPIO side, and the short leg (cathode) goes to GND.
 

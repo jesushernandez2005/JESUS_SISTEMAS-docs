@@ -33,6 +33,7 @@ GPIO8 → Button 2 (speed)         → GND   (internal pull-up)
 ```
 
 <!-- SPACE FOR CIRCUIT DIAGRAM IMAGE -->
+<img src="proto.html" alt="4-LED connection diagram" width="640">
 
 Unlike the logic-gate exercises, both buttons here use the microcontroller's internal **pull-up** (`gpio_pull_up()`), so each pin reads `1` when not pressed and drops to `0` when pressed. The interrupt is set on `GPIO_IRQ_EDGE_RISE`, so it fires the moment the button is released back up.
 

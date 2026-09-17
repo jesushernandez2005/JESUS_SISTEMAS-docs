@@ -29,7 +29,7 @@ GPIO2 → LED → 220Ω resistor → GND
 GPIO6 → Button A → GND     (internal pull-down)
 GPIO7 → Button B → GND     (internal pull-down)
 ```
-![Diagrama de circuito AND/OR/XOR](esquematico.jpg)
+<img src="proto.html" alt="4-LED connection diagram" width="640">
 /// caption
 Diagrama de conexión para las compuertas AND, OR y XOR
 ///
