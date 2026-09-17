@@ -30,7 +30,7 @@ GPIO6 → Button A → GND     (internal pull-down)
 GPIO7 → Button B → GND     (internal pull-down)
 ```
 
-<iframe src="proto.html" width="640" height="480" frameborder="0"></iframe>
+![connection diagram](diagrama.png)
 /// caption
 Diagrama de conexión para las compuertas AND, OR y XOR
 ///

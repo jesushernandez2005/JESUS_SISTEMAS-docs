@@ -32,7 +32,7 @@ GPIO7 → Button 1 (win / restart) → GND   (internal pull-up)
 GPIO8 → Button 2 (speed)         → GND   (internal pull-up)
 ```
 
-<iframe src="proto.html" width="640" height="480" frameborder="0"></iframe>
+![connection diagram](diagrama1.png)
 /// caption
 Diagrama de conexión para la ruleta de LEDs
 ///

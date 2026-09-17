@@ -51,7 +51,7 @@ Logical grid layout (position i, not physical pin number):
 ```
 
 <!-- SPACE FOR CIRCUIT DIAGRAM IMAGE -->
-<img src="proto.html" alt="4-LED connection diagram" width="640">
+![connection diagram](diagrama2.png)
 
 As in the roulette lab, every button uses the Pico's internal **pull-up** (`gpio_pull_up()`), so each pin reads `1` when idle and drops to `0` on press. Unlike the roulette, the interrupt here is set on `GPIO_IRQ_EDGE_FALL` (the moment the button goes down), not the rising edge — since the win/lose logic needs to react the instant the press happens, not on release.
 
