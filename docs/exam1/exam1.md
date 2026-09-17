@@ -232,6 +232,12 @@ Restart is intentionally written without checking `gane` at all — it regenerat
 Pressing any of the nine grid buttons toggles the expected plus-shaped set of LEDs, correctly clipped at edges and corners. The board always starts on a non-empty, always-solvable configuration, and two consecutive resets produce visibly different boards. The instant the ninth LED goes dark the board enters a synchronized blink that grid presses no longer affect; pressing restart returns to a fresh board immediately, whether idle, mid-game, or mid-blink.
 
 <!-- SPACE FOR VIDEO -->
+<video controls width="640" height="360">
+  <source src="../botones.mp4" type="video/mp4">
+</video>
+<video controls width="640" height="360">
+  <source src="../gane.mp4" type="video/mp4">
+</video>
 <!-- Blackout 3x3 -->
 
 ## Conclusions
