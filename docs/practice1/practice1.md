@@ -60,7 +60,7 @@ The 4 LEDs show a binary number counting from `0000` to `1111` (0 to 15), then r
 
 <!-- SPACE FOR VIDEO -->
 <video controls width="640" height="360">
-  <source src="ejercicio1.mp4" type="ejercicio1/mp4">
+  <source src="ejercicio1.mp4" type="video/mp4">
 </video>
 
 ### Code
