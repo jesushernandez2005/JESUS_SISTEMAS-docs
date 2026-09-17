@@ -32,8 +32,10 @@ GPIO7 → Button 1 (win / restart) → GND   (internal pull-up)
 GPIO8 → Button 2 (speed)         → GND   (internal pull-up)
 ```
 
-<!-- SPACE FOR CIRCUIT DIAGRAM IMAGE -->
-<img src="proto.html" alt="4-LED connection diagram" width="640">
+<iframe src="proto.html" width="640" height="480" frameborder="0"></iframe>
+/// caption
+Diagrama de conexión para la ruleta de LEDs
+///
 
 Unlike the logic-gate exercises, both buttons here use the microcontroller's internal **pull-up** (`gpio_pull_up()`), so each pin reads `1` when not pressed and drops to `0` when pressed. The interrupt is set on `GPIO_IRQ_EDGE_RISE`, so it fires the moment the button is released back up.
 
@@ -201,15 +203,11 @@ All three shared variables (`gane`, `counter`, `vel`) are marked `volatile`, sin
 
 The LED sequence runs as a continuous roulette. Pressing the win button while the middle LED (GPIO4) is lit switches all 5 LEDs into a synchronized blink; pressing it again while blinking resets the game and the roulette starts over from the first LED. Pressing the win button while any other LED is lit does nothing. The speed button reliably cycles the roulette through slow, medium, and fast on each press, whether the game is currently won or running.
 
-<!-- SPACE FOR VIDEO -->
-<!-- LED Roulette -->
-<iframe width="640" height="360"
-  src="https://youtube.com/shorts/uBzF-U9Sklg?si=Dd2gspID02_qHoQ1"
-  title="LED Roulette"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-  allowfullscreen>
-</iframe>
+### Video
+
+<video controls width="640" height="360">
+  <source src="ruleta.mp4" type="video/mp4">
+</video>
 
 ## Conclusions
 

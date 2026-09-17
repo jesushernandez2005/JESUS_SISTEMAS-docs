@@ -29,10 +29,12 @@ GPIO2 → LED → 220Ω resistor → GND
 GPIO6 → Button A → GND     (internal pull-down)
 GPIO7 → Button B → GND     (internal pull-down)
 ```
-<img src="proto.html" alt="4-LED connection diagram" width="640">
+
+<iframe src="proto.html" width="640" height="480" frameborder="0"></iframe>
 /// caption
 Diagrama de conexión para las compuertas AND, OR y XOR
 ///
+
 ```
 GPIO2 → LED0 → 220Ω resistor → GND
 GPIO3 → LED1 → 220Ω resistor → GND
@@ -110,15 +112,11 @@ The LED only lights up while both buttons are held down together; letting go of 
 
 Checking each button bit separately in the `if` worked fine and honestly reads closer to normal AND logic than comparing against a combined mask. Adding the `printf` helped me trust the LED's behavior because I could see the raw bits while testing.
 
-<!-- AND -->
-<iframe width="640" height="360" 
-  src="https://www.youtube.com/watch?v=iVDNHh9myGY" 
-  title="AND" 
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-  allowfullscreen>
-</iframe>
+### Video
 
+<video controls width="640" height="360">
+  <source src="And2.mp4" type="video/mp4">
+</video>
 
 ---
 
@@ -184,15 +182,11 @@ Pressing either button, or both, lights the LED. It only stays off when neither 
 
 Going from AND to OR just meant switching the condition to check the combined mask instead of both bits one by one — same register read, different comparison.
 
-<!-- OR -->
-<iframe width="640" height="360" 
-  src="https://www.youtube.com/watch?v=9c4pL6IqUuc" 
-  title="OR" 
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-  allowfullscreen>
-</iframe>
+### Video
 
+<video controls width="640" height="360">
+  <source src="OR.mp4" type="video/mp4">
+</video>
 
 ---
 
@@ -259,15 +253,11 @@ The LED turns on for A-only or B-only, and stays off when both or neither button
 
 XOR needed a different approach than AND/OR since no single mask covers both valid combinations. Splitting the bits into `a` and `b` and using `^` was the simplest way to match its truth table.
 
-<!-- XOR -->
-<iframe width="640" height="360" 
-  src="https://www.youtube.com/watch?v=gAFcZZhO4N4" 
-  title="XOR" 
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-  allowfullscreen>
-</iframe>
+### Video
 
+<video controls width="640" height="360">
+  <source src="XOR.mp4" type="video/mp4">
+</video>
 
 ---
 
@@ -348,12 +338,8 @@ The LED moves one step per press in either direction, and instead of stopping at
 
 Switching from a blocking `while (gpio_get(...))` to a press/release flag per button gets the same one-step-per-press behavior without freezing the main loop, and it made adding the wrap-around a lot easier than trying to clamp at the edges.
 
-<!-- SPACE FOR VIDEO -->
-<!-- Moving LED -->
-<iframe width="640" height="360" 
-  src="https://www.youtube.com/watch?v=gAFcZZhO4N4" 
-  title="Moving LED" 
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-  allowfullscreen>
-</iframe>
+### Video
+
+<video controls width="640" height="360">
+  <source src="TOY.mp4" type="video/mp4">
+</video>
