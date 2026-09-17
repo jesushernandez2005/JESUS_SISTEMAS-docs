@@ -32,7 +32,7 @@ GPIO7 → Button 1 (win / restart) → GND   (internal pull-up)
 GPIO8 → Button 2 (speed)         → GND   (internal pull-up)
 ```
 
-![connection diagram](diagrama1.png)
+![connection diagram](../diagrama1.png)
 /// caption
 Diagrama de conexión para la ruleta de LEDs
 ///
@@ -206,7 +206,7 @@ The LED sequence runs as a continuous roulette. Pressing the win button while th
 ### Video
 
 <video controls width="640" height="360">
-  <source src="ruleta.mp4" type="video/mp4">
+  <source src="../ruleta.mp4" type="video/mp4">
 </video>
 
 ## Conclusions

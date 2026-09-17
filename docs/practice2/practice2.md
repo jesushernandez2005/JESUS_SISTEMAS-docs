@@ -30,7 +30,7 @@ GPIO6 → Button A → GND     (internal pull-down)
 GPIO7 → Button B → GND     (internal pull-down)
 ```
 
-![connection diagram](diagrama.png)
+![connection diagram](../diagrama.png)
 /// caption
 Diagrama de conexión para las compuertas AND, OR y XOR
 ///
@@ -115,7 +115,7 @@ Checking each button bit separately in the `if` worked fine and honestly reads c
 ### Video
 
 <video controls width="640" height="360">
-  <source src="And2.mp4" type="video/mp4">
+  <source src="../And2.mp4" type="video/mp4">
 </video>
 
 ---
@@ -185,7 +185,7 @@ Going from AND to OR just meant switching the condition to check the combined ma
 ### Video
 
 <video controls width="640" height="360">
-  <source src="OR.mp4" type="video/mp4">
+  <source src="../OR.mp4" type="video/mp4">
 </video>
 
 ---
@@ -256,7 +256,7 @@ XOR needed a different approach than AND/OR since no single mask covers both val
 ### Video
 
 <video controls width="640" height="360">
-  <source src="XOR.mp4" type="video/mp4">
+  <source src="../XOR.mp4" type="video/mp4">
 </video>
 
 ---
@@ -341,5 +341,5 @@ Switching from a blocking `while (gpio_get(...))` to a press/release flag per bu
 ### Video
 
 <video controls width="640" height="360">
-  <source src="TOY.mp4" type="video/mp4">
+  <source src="../TOY.mp4" type="video/mp4">
 </video>
