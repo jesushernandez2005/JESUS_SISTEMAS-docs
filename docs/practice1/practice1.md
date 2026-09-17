@@ -45,7 +45,7 @@ GPIO4 → LED2 → 220Ω resistor → GND
 GPIO5 → LED3 → 220Ω resistor → GND
 ```
 
-![4-LED connection diagram](4leds.jpg)
+![4-LED connection diagram](../4leds.jpg)
 
 The LED's long leg (anode) goes to the resistor/GPIO side, and the short leg (cathode) goes to GND.
 
@@ -58,7 +58,7 @@ The 4 LEDs show a binary number counting from `0000` to `1111` (0 to 15), then r
 ### Video
 
 <video controls width="640" height="360">
-  <source src="ejercicio1.mp4" type="video/mp4">
+  <source src="../ejercicio1.mp4" type="video/mp4">
 </video>
 
 ### Code
@@ -114,7 +114,7 @@ A single LED moves from one end of the row to the other and back, over and over.
 ### Video
 
 <video controls width="640" height="360">
-  <source src="ejercicio2.mp4" type="video/mp4">
+  <source src="../ejercicio2.mp4" type="video/mp4">
 </video>
 
 ### Code
@@ -176,7 +176,7 @@ LEDs turn on one by one from one side until all 4 are lit, then turn off one by 
 ### Video
 
 <video controls width="640" height="360">
-  <source src="ejercicio3.mp4" type="video/mp4">
+  <source src="../ejercicio3.mp4" type="video/mp4">
 </video>
 
 ### Code
@@ -238,7 +238,7 @@ LEDs turn on starting from the outer edges and move toward the center, then turn
 ### Video
 
 <video controls width="640" height="360">
-  <source src="ejercicio4.mp4" type="video/mp4">
+  <source src="../ejercicio4.mp4" type="video/mp4">
 </video>
 
 ### Code
