@@ -48,10 +48,6 @@ GPIO1 (UART0 RX) → TX of the USB-TTL adapter
 GND              → GND of the USB-TTL adapter
 ```
 
-![temperature diagram](../diagrama_temperatura.png)
-/// caption
-Diagrama de conexión del sensor de temperatura
-///
 
 ### Source Code
 
@@ -104,7 +100,7 @@ The temperature is printed twice per second on both the USB serial monitor and t
 ### Video
 
 <video controls width="640" height="360">
-  <source src="../temperatura.mp4" type="video/mp4">
+  <source src="../adc_pot_temp_demo.mp4" type="video/mp4">
 </video>
 
 ---
@@ -123,7 +119,7 @@ GPIO1 (UART0 RX) → TX of the USB-TTL adapter
 GND              → GND of the USB-TTL adapter
 ```
 
-![potentiometer diagram](../diagrama_potenciometro.png)
+![potentiometer diagram](../potenciometro.jpg)
 /// caption
 Diagrama de conexión del potenciómetro
 ///
@@ -179,13 +175,6 @@ This time the sensor is on GPIO27, which is ADC channel 1, so it's selected with
 
 Turning the knob from one end to the other moves the angle from 0° to about 258° and the voltage from 0 V to 3.3 V. The angle is shown on the UART terminal and both values on the USB serial monitor.
 
-### Video
-
-<video controls width="640" height="360">
-  <source src="../potenciometro.mp4" type="video/mp4">
-</video>
-
----
 
 ## Activity 3 — Sound level with a microphone
 
