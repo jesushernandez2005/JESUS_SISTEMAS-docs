@@ -125,7 +125,7 @@ The serial monitor shows both devices being read on the same bus. The RTC is fir
 ### Video
 
 <video controls width="640" height="360">
-  <source src="i2c_wokwi_demo.mp4" type="video/mp4">
+  <source src="../i2c_wokwi_demo.mp4" type="video/mp4">
 </video>
 
 ## Conclusions
