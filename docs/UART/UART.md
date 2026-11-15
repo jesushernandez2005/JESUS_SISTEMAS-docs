@@ -179,7 +179,7 @@ Pressing a button on one board lights the matching LED on the other board, and t
 ### Video
 
 <video controls width="640" height="360">
-  <source src="UART.mp4" type="video/mp4">
+  <source src="../UART.mp4" type="video/mp4">
 </video>
 
 ## Conclusions

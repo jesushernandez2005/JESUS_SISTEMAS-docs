@@ -174,7 +174,7 @@ Each key plays its note while held down and the buzzer goes silent as soon as it
 ### Video
 
 <video controls width="640" height="360">
-  <source src="piano.mp4" type="video/mp4">
+  <source src="../piano.mp4" type="video/mp4">
 </video>
 
 ## Conclusions

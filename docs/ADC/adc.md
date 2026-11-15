@@ -275,7 +275,7 @@ In silence, `raw_wave` stays near 0 and the envelope stays low. When speaking or
 ### Video
 
 <video controls width="640" height="360">
-  <source src="SONIDO.mp4" type="video/mp4">
+  <source src="../SONIDO.mp4" type="video/mp4">
 </video>
 
 ---
@@ -310,7 +310,7 @@ Diagrama de conexión del sensor de luz
 ### Video
 
 <video controls width="640" height="360">
-  <source src="LUZ.mp4" type="video/mp4">
+  <source src="../LUZ.mp4" type="video/mp4">
 </video>
 
 ---
