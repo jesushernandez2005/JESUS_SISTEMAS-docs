@@ -41,10 +41,6 @@ Pico 1 GPIO1 (RX) ← Pico 2 GPIO0 (TX)
 Pico 1 GND        ↔ Pico 2 GND
 ```
 
-![connection diagram](../diagrama_uart.png)
-/// caption
-Diagrama de conexión entre las dos Pico
-///
 
 The TX and RX lines have to be **crossed**: what one board transmits has to arrive at the receiving pin of the other. The shared GND is also essential, because UART levels are measured relative to ground; without a common reference the receiver can't tell a `1` from a `0`.
 
@@ -183,7 +179,7 @@ Pressing a button on one board lights the matching LED on the other board, and t
 ### Video
 
 <video controls width="640" height="360">
-  <source src="../uart.mp4" type="video/mp4">
+  <source src="UART.mp4" type="video/mp4">
 </video>
 
 ## Conclusions

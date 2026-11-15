@@ -39,7 +39,7 @@ GPIO12 → Volume down → GND
 (All buttons use the internal pull-up)
 ```
 
-![connection diagram](../diagrama_piano.png)
+![connection diagram](PIANO.jpeg)
 /// caption
 Diagrama de conexión del piano digital
 ///
@@ -174,7 +174,7 @@ Each key plays its note while held down and the buzzer goes silent as soon as it
 ### Video
 
 <video controls width="640" height="360">
-  <source src="../piano.mp4" type="video/mp4">
+  <source src="piano.mp4" type="video/mp4">
 </video>
 
 ## Conclusions
