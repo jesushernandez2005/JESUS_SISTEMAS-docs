@@ -121,7 +121,7 @@ GND              → GND of the USB-TTL adapter
 
 ![potentiometer diagram](../potenciometro.jpg)
 /// caption
-Diagrama de conexión del potenciómetro
+potentiometer diagram
 ///
 
 ### Source Code
@@ -188,7 +188,7 @@ Microphone GND → GND
 
 ![microphone diagram](diagrama_microfono.jpeg)
 /// caption
-Diagrama de conexión del micrófono
+microphone diagram
 ///
 
 ### Source Code
@@ -273,28 +273,99 @@ In silence, `raw_wave` stays near 0 and the envelope stays low. When speaking or
 
 ### Circuit Diagram
 
+The photoresistor (LDR) is not read directly: it forms a voltage divider with a fixed resistor, and the middle point of the divider goes to the ADC.
+
 ```
-(complete)
+3V3 ── LDR ──┬── R fija ── GND
+             │
+             └──→ GPIO26 (ADC0)
 ```
+
+With the LDR on the 3V3 side, more light → lower LDR resistance → higher voltage on GPIO26.
 
 ![light sensor diagram](diagrama_luz.jpeg)
 /// caption
-Diagrama de conexión del sensor de luz
+light sensor diagram
 ///
 
 ### Source Code
 
 ```c
-// (paste the light sensor code here)
+#include <stdio.h>
+#include "pico/stdlib.h"
+#include "hardware/adc.h"
+
+#define LDR_ADC_INPUT 0            // Canal 0 -> GPIO26
+#define LDR_GPIO_PIN 26            // Pin donde se conecta el divisor de voltaje del LDR
+const float alpha = 0.0625f;       // Filtro EMA (0.0625 = 1/16) para estabilizar la lectura
+
+const uint16_t LDR_MIN = 9;        // lectura tapando el LDR (oscuridad)
+const uint16_t LDR_MAX = 3600;     // lectura con luz directa (lampara del cel)
+
+int main() {
+    stdio_init_all();
+    adc_init();
+    adc_gpio_init(LDR_GPIO_PIN);
+    adc_select_input(LDR_ADC_INPUT);
+
+    bool y_init = false;
+    float y = 0.0f;
+
+    printf("Iniciando lectura de Fotorresistencia (LDR)...\n");
+
+    while (true) {
+        uint16_t x = adc_read();   // Lectura cruda (0..4095)
+
+        if (!y_init) {
+            y = (float)x;
+            y_init = true;
+        } else {
+            y = alpha * (float)x + (1.0f - alpha) * y;
+        }
+
+        uint16_t filtro = (uint16_t)(y + 0.5f);
+        float voltaje = filtro * 3.3f / 4095.0f;
+
+        // pasar a porcentaje con el rango que medimos (LDR_MIN..LDR_MAX)
+        int nivel;
+        if (filtro <= LDR_MIN) nivel = 0;
+        else if (filtro >= LDR_MAX) nivel = 100;
+        else nivel = (int)((filtro - LDR_MIN) * 100.0f / (LDR_MAX - LDR_MIN));
+
+        printf("LDR Raw=%u | Filtro=%u | Voltaje=%.2fV | Nivel=%d%%\n", x, filtro, voltaje, nivel);
+        sleep_ms(100);
+    }
+}
 ```
 
 ### How it works
 
-*(complete)*
+An LDR changes its resistance with light: it's high (hundreds of kΩ) in the dark and drops to a few kΩ under strong light. The ADC can only measure voltage, so the LDR is placed in a voltage divider with a fixed resistor. With the LDR on the 3.3 V side, the voltage at GPIO26 rises when there is more light, and the ADC reading goes up with it.
+
+The program does three things with every sample:
+
+1. **Raw reading:** `adc_read()` on channel 0 (GPIO26) gives a value from 0 to 4095.
+2. **EMA filter:** the same exponential moving average used with the microphone, `y = α·x + (1 − α)·y`, but with `α = 0.0625` (1/16). Each new sample only weighs 6.25 %, so flickering from the room lights and small hand movements are smoothed out. As with the microphone, the first sample initializes `y` so the filter doesn't start from 0. The value is rounded with `+ 0.5f` before casting to an integer.
+3. **Conversion:** the filtered value is turned into volts with `filtro × 3.3 / 4095`, and into a light level from 0 % to 100 % using the range measured during calibration:
+
+```
+nivel = (filtro − LDR_MIN) × 100 / (LDR_MAX − LDR_MIN)
+```
+
+`LDR_MIN = 9` is the reading with the sensor fully covered and `LDR_MAX = 3600` the reading with the phone flashlight pointed straight at it. The `if`/`else` limits the result to 0–100 % in case a reading goes outside that range. Using the measured range instead of the full 0–4095 makes the percentage actually use the whole scale, since this divider never reaches 3.3 V.
 
 ### Results
 
-*(complete)*
+The serial monitor shows the raw reading, the filtered value, the voltage and the light level on every line:
+
+| Condition | Raw | Filtro | Voltaje | Nivel |
+|---|---|---|---|---|
+| Sensor covered with the hands | 38 | 37 | 0.03 V | 0 % |
+| Room light | 785 | 731 | 0.59 V | 20 % |
+| Phone flashlight approaching | 2878 | 1673 | 1.35 V | 46 % |
+| Flashlight removed | 960 | 2329 | 1.88 V | 64 % |
+
+The table shows the effect of the filter: when the flashlight is turned on, `Raw` jumps to almost 2900 immediately, but `Filtro` climbs gradually over several samples; when the light is removed, `Raw` drops right away while `Filtro` is still coming down. The level only reaches its final value after a second or two, but it doesn't jump around.
 
 ### Video
 
@@ -303,7 +374,6 @@ Diagrama de conexión del sensor de luz
 </video>
 
 ---
-
 ## Conclusions
 
 These activities showed that the ADC by itself only gives a number from 0 to 4095, and that the real work is in the conversion that follows, which depends entirely on the sensor: a fixed 10 mV/°C scale for the LM35, a proportional mapping to the mechanical range for the potentiometer, and DC removal, rectification and filtering for the microphone. Adding the UART also made it clear that `printf()` over USB and `uart_puts()` on GPIO0/GPIO1 are two independent channels, and that the UART only sends text, so values have to be formatted with `sprintf()` first. The microphone activity was the most interesting one: a simple EMA filter was enough to turn a noisy signal into a stable volume level, although the 100 ms sampling period means it measures loudness and not the actual audio waveform; capturing real audio would require sampling at several kHz.
