@@ -8,33 +8,28 @@ tags: [embedded-systems, raspberry-pi-pico-2, adc, uart, sensors, lm35, potentio
 
 ## Objective
 
-Use the RP2350's 12-bit ADC to read four different analog sensors and turn the raw readings into physical quantities: temperature, rotation angle, sound level and light intensity. Some activities also send the converted value through the hardware UART, in addition to the USB serial monitor, so the data can be read by an external device.
+Read four analog sensors with the RP2350's ADC and convert the readings into temperature, angle, sound level and light level. In some activities the value is also sent through UART0.
 
-## Materials and Components
+## Materials
 
-- 1 × Raspberry Pi Pico 2 W
-- 1 × LM35 temperature sensor
-- 1 × Potentiometer
-- 1 × Microphone module with analog output
-- 1 × Light sensor *(complete)*
-- 1 × USB-to-TTL serial adapter (to read the UART output)
-- 1 × Protoboard
-- Male-to-male jumper wires
-- Micro-USB cable (programming and power)
+- Raspberry Pi Pico 2 W
+- LM35 temperature sensor
+- Potentiometer
+- Analog microphone module
+- LDR + fixed resistor
+- USB-to-TTL adapter (to read the UART)
+- Protoboard, jumper wires, micro-USB cable
 
-## ADC basics on the RP2350
+## ADC basics
 
-The ADC has a 12-bit resolution, so `adc_read()` returns a value between 0 and 4095, where 0 corresponds to 0 V and 4095 to the 3.3 V reference. Every activity uses the same conversion to get back to volts:
-
-```
-V = lectura × 3.3 / 4095
-```
-
-The analog-capable pins are GPIO26 (ADC0), GPIO27 (ADC1) and GPIO28 (ADC2). Each one has to be prepared with `adc_gpio_init()`, which disconnects the digital logic from the pin, and then selected with `adc_select_input()`, since the ADC can only convert one channel at a time.
+- 12 bits → `adc_read()` returns 0 to 4095 (0 V to 3.3 V).
+- To get volts: `V = lectura × 3.3 / 4095`
+- ADC pins: GPIO26 (ADC0), GPIO27 (ADC1), GPIO28 (ADC2).
+- `adc_gpio_init()` prepares the pin and `adc_select_input()` chooses the channel (only one is converted at a time).
 
 ---
 
-## Activity 1 — Temperature sensor (LM35)
+## Activity 1 — Temperature (LM35)
 
 ### Circuit Diagram
 
@@ -47,7 +42,6 @@ GPIO0 (UART0 TX) → RX of the USB-TTL adapter
 GPIO1 (UART0 RX) → TX of the USB-TTL adapter
 GND              → GND of the USB-TTL adapter
 ```
-
 
 ### Source Code
 
@@ -89,13 +83,14 @@ int main() {
 
 ### How it works
 
-The LM35 outputs a voltage directly proportional to temperature, with a scale of 10 mV per °C and no offset (0 V at 0 °C). After converting the ADC reading to volts, dividing by `0.01` gives the temperature in °C: for example, 0.25 V corresponds to 25 °C.
-
-The UART is configured at 115200 baud with the 8N1 format (8 data bits, no parity, 1 stop bit) through `uart_init()` and `uart_set_format()`, and GPIO0/GPIO1 are switched to their UART function with `gpio_set_function()`. Since `uart_puts()` only sends strings, the value is first formatted into the `texto` buffer with `sprintf()`. The UART message ends in `\r\n` so serial terminals jump to the start of the next line. The same value is also printed through `printf()`, which goes to the USB serial monitor. A new reading is taken every 500 ms.
+- The LM35 gives **10 mV per °C**, so `temp = voltaje / 0.01` (0.25 V = 25 °C).
+- UART0 at 115200 baud, 8N1, on GPIO0/GPIO1.
+- `uart_puts()` only sends text, so I format the value with `sprintf()` first.
+- `printf()` goes to USB and `uart_puts()` goes to the UART. They're two separate outputs.
 
 ### Results
 
-The temperature is printed twice per second on both the USB serial monitor and the terminal connected to the UART. Holding the sensor between the fingers makes the reading rise by a few degrees and it slowly returns to room temperature when released.
+The temperature shows up on both terminals every 500 ms. When I hold the sensor between my fingers it goes up a few degrees and then slowly comes back down.
 
 ### Video
 
@@ -105,7 +100,7 @@ The temperature is printed twice per second on both the USB serial monitor and t
 
 ---
 
-## Activity 2 — Rotation angle with a potentiometer
+## Activity 2 — Angle with a potentiometer
 
 ### Circuit Diagram
 
@@ -163,18 +158,16 @@ int main() {
 
 ### How it works
 
-The potentiometer works as a voltage divider between 3.3 V and GND: as the knob turns, the wiper voltage changes linearly from 0 V to 3.3 V, so the ADC reading goes from 0 to 4095. The angle is obtained by scaling that reading to the mechanical rotation range of the potentiometer, 258.26°:
-
-```
-angulo = lectura × 258.26 / 4095
-```
-
-This time the sensor is on GPIO27, which is ADC channel 1, so it's selected with `adc_select_input(1)`. The UART setup is the same as in Activity 1. The angle is sent through both the UART and USB, while the wiper voltage is only printed on the USB serial monitor, which is useful to check that the angle and the voltage agree. Readings are taken every 200 ms so the value follows the knob smoothly.
+- The potentiometer is a voltage divider: the wiper goes from 0 V to 3.3 V (0 to 4095).
+- I map the reading to its mechanical range of 258.26°: `angulo = lectura × 258.26 / 4095`
+- It's on GPIO27, so the channel is `adc_select_input(1)`.
+- I also print the voltage over USB to check that it matches the angle.
 
 ### Results
 
-Turning the knob from one end to the other moves the angle from 0° to about 258° and the voltage from 0 V to 3.3 V. The angle is shown on the UART terminal and both values on the USB serial monitor.
+From one end to the other the angle goes from 0° to ~258° and the voltage from 0 V to 3.3 V.
 
+---
 
 ## Activity 3 — Sound level with a microphone
 
@@ -246,20 +239,17 @@ int main() {
 
 ### How it works
 
-An audio signal swings above and below zero, but the ADC can only read positive voltages. That's why the microphone module adds a DC offset of about 1.65 V (half of 3.3 V), which in ADC counts is ≈2048. The program processes each sample in three steps:
+The microphone signal is centered at ~1.65 V (≈2048 counts) because the ADC can't read negative voltages. Each sample goes through 3 steps:
 
-1. **Remove the DC level:** subtracting `ADC_CENTER` centers the wave on 0, so `audio_wave` goes roughly from −2048 to +2047.
-2. **Rectify:** `abs()` keeps only the magnitude, turning the negative half of the wave positive. This is the digital version of a full-wave rectifier.
-3. **Smooth with an EMA:** an exponential moving average, `y = α·x + (1 − α)·y`, works as a low-pass filter that follows the general shape of the amplitude (the *envelope*) instead of every individual peak. With `α = 0.05` each new sample only contributes 5 %, so the result is very smooth but reacts slowly. The first sample initializes `y` directly so the filter doesn't start from 0.
+1. **Remove DC:** `x − 2048` centers the wave on 0.
+2. **Rectify:** `abs()` makes the negative part positive (like a full-wave rectifier).
+3. **EMA filter:** `y = α·x + (1 − α)·y` with α = 0.05 smooths the amplitude and gives the **envelope** (the general volume).
 
-Both `raw_wave` and `volume_envelope` are printed in `name=value` format, which the Serial Plotter can graph as two separate lines.
-
-The loop uses `sleep_ms(100)`, which gives a sampling rate of about 10 Hz. That's far too slow to capture the shape of a voice signal (it would need several kHz, as the comment in the code notes), so each reading is effectively a random point of the wave. Even so, louder sounds produce larger values more often, and the EMA turns that into a usable estimate of the overall sound level. With α = 0.05 at 10 Hz, the envelope takes around 2 seconds to settle after a change in volume.
+At 100 ms per sample (10 Hz) I can't capture the actual waveform (voice needs several kHz), but louder sounds still give bigger values, so the envelope works as a volume meter.
 
 ### Results
 
-In silence, `raw_wave` stays near 0 and the envelope stays low. When speaking or clapping near the microphone, `raw_wave` jumps to large positive and negative values and the envelope rises gradually, then decays back slowly once the sound stops.
-
+In silence the envelope stays low. When I talk or clap, `raw_wave` jumps a lot and the envelope goes up slowly, then goes back down when the sound stops.
 
 ### Video
 
@@ -269,19 +259,15 @@ In silence, `raw_wave` stays near 0 and the envelope stays low. When speaking or
 
 ---
 
-## Activity 4 — Light sensor
+## Activity 4 — Light sensor (LDR)
 
 ### Circuit Diagram
-
-The photoresistor (LDR) is not read directly: it forms a voltage divider with a fixed resistor, and the middle point of the divider goes to the ADC.
 
 ```
 3V3 ── LDR ──┬── R fija ── GND
              │
              └──→ GPIO26 (ADC0)
 ```
-
-With the LDR on the 3V3 side, more light → lower LDR resistance → higher voltage on GPIO26.
 
 ![light sensor diagram](diagrama_luz.jpeg)
 /// caption
@@ -340,32 +326,26 @@ int main() {
 
 ### How it works
 
-An LDR changes its resistance with light: it's high (hundreds of kΩ) in the dark and drops to a few kΩ under strong light. The ADC can only measure voltage, so the LDR is placed in a voltage divider with a fixed resistor. With the LDR on the 3.3 V side, the voltage at GPIO26 rises when there is more light, and the ADC reading goes up with it.
-
-The program does three things with every sample:
-
-1. **Raw reading:** `adc_read()` on channel 0 (GPIO26) gives a value from 0 to 4095.
-2. **EMA filter:** the same exponential moving average used with the microphone, `y = α·x + (1 − α)·y`, but with `α = 0.0625` (1/16). Each new sample only weighs 6.25 %, so flickering from the room lights and small hand movements are smoothed out. As with the microphone, the first sample initializes `y` so the filter doesn't start from 0. The value is rounded with `+ 0.5f` before casting to an integer.
-3. **Conversion:** the filtered value is turned into volts with `filtro × 3.3 / 4095`, and into a light level from 0 % to 100 % using the range measured during calibration:
+- The LDR's resistance drops with light, so I put it in a divider with a fixed resistor. With the LDR on the 3V3 side: **more light → more voltage**.
+- Same EMA filter as the microphone, with α = 1/16, so the reading doesn't jump with the room lights.
+- I convert to a percentage using the range I measured (covered = 9, phone flashlight = 3600):
 
 ```
 nivel = (filtro − LDR_MIN) × 100 / (LDR_MAX − LDR_MIN)
 ```
 
-`LDR_MIN = 9` is the reading with the sensor fully covered and `LDR_MAX = 3600` the reading with the phone flashlight pointed straight at it. The `if`/`else` limits the result to 0–100 % in case a reading goes outside that range. Using the measured range instead of the full 0–4095 makes the percentage actually use the whole scale, since this divider never reaches 3.3 V.
+- The `if`/`else` keeps it between 0 and 100 %.
 
 ### Results
 
-The serial monitor shows the raw reading, the filtered value, the voltage and the light level on every line:
-
 | Condition | Raw | Filtro | Voltaje | Nivel |
 |---|---|---|---|---|
-| Sensor covered with the hands | 38 | 37 | 0.03 V | 0 % |
+| Covered with my hands | 38 | 37 | 0.03 V | 0 % |
 | Room light | 785 | 731 | 0.59 V | 20 % |
-| Phone flashlight approaching | 2878 | 1673 | 1.35 V | 46 % |
+| Flashlight approaching | 2878 | 1673 | 1.35 V | 46 % |
 | Flashlight removed | 960 | 2329 | 1.88 V | 64 % |
 
-The table shows the effect of the filter: when the flashlight is turned on, `Raw` jumps to almost 2900 immediately, but `Filtro` climbs gradually over several samples; when the light is removed, `Raw` drops right away while `Filtro` is still coming down. The level only reaches its final value after a second or two, but it doesn't jump around.
+You can see the filter in the table: `Raw` changes right away, but `Filtro` takes a few samples to catch up.
 
 ### Video
 
@@ -374,6 +354,10 @@ The table shows the effect of the filter: when the flashlight is turned on, `Raw
 </video>
 
 ---
-## Conclusions
 
-These activities showed that the ADC by itself only gives a number from 0 to 4095, and that the real work is in the conversion that follows, which depends entirely on the sensor: a fixed 10 mV/°C scale for the LM35, a proportional mapping to the mechanical range for the potentiometer, and DC removal, rectification and filtering for the microphone. Adding the UART also made it clear that `printf()` over USB and `uart_puts()` on GPIO0/GPIO1 are two independent channels, and that the UART only sends text, so values have to be formatted with `sprintf()` first. The microphone activity was the most interesting one: a simple EMA filter was enough to turn a noisy signal into a stable volume level, although the 100 ms sampling period means it measures loudness and not the actual audio waveform; capturing real audio would require sampling at several kHz.
+## What I learned
+
+- The ADC only gives a number from 0 to 4095. The useful part is the conversion, and it's different for each sensor.
+- `printf()` (USB) and `uart_puts()` (UART) are independent, and the UART only sends text, so I need `sprintf()`.
+- An EMA filter is easy to code and makes noisy readings (microphone, LDR) stable, but it adds delay.
+- Sampling every 100 ms is enough for volume, but not to capture real audio.

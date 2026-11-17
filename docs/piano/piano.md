@@ -8,16 +8,14 @@ tags: [embedded-systems, raspberry-pi-pico-2, gpio, pwm, buzzer, c, piano]
 
 ## Objective
 
-Use the RP2350's PWM hardware to generate audio tones on a buzzer and build an 8-key digital piano covering one full octave (Do to Do). Each key plays its note while it is held down, and two extra buttons raise or lower the volume by changing the PWM duty cycle.
+Build an 8-key piano (one octave, Do to Do) with a buzzer and PWM. Each key plays its note while held, and two buttons raise or lower the volume by changing the duty cycle.
 
-## Materials and Components
+## Materials
 
-- 1 × Raspberry Pi Pico 2 W
-- 1 × Passive buzzer (must be passive so it follows the PWM frequency)
-- 10 × Push-button (8 piano keys + 2 volume buttons)
-- 1 × Protoboard
-- Male-to-male jumper wires
-- Micro-USB cable (programming and power)
+- Raspberry Pi Pico 2 W
+- Passive buzzer (it has to be passive so it follows the PWM frequency)
+- 10 push-buttons (8 keys + 2 volume)
+- Protoboard, jumper wires, micro-USB cable
 
 ## Circuit Diagram
 
@@ -41,10 +39,10 @@ GPIO12 → Volume down → GND
 
 ![connection diagram](PIANO.jpeg)
 /// caption
-Diagrama de conexión del piano digital
+Digital piano connection diagram
 ///
 
-All 10 buttons are configured in a single loop with `gpio_pull_up()`, so every pin reads `1` while released and `0` while pressed. That's why the code checks for `gpio_get(pin) == 0` to detect a press.
+With the pull-up, a button reads `1` when released and `0` when pressed, so I check for `gpio_get(pin) == 0`.
 
 ## Source Code
 
@@ -140,18 +138,16 @@ int main() {
 
 ## How it works
 
-GPIO2 is handed over to the PWM peripheral with `gpio_set_function(BUZZER, GPIO_FUNC_PWM)`. Each PWM slice has a counter that runs from 0 up to the wrap value `TOP` and then restarts, so one full PWM period is `TOP + 1 = 1024` counts. `pwm_gpio_to_slice_num()` and `pwm_gpio_to_channel()` find which slice and channel GPIO2 belongs to, so the code doesn't have to hard-code them.
+### Pitch → clock divider
 
-The **pitch** of the note is controlled with the clock divider. The RP2350 runs at 150 MHz, so the output frequency is:
+The PWM counter goes from 0 to `TOP` (1023), so one period is 1024 counts. With the 150 MHz clock:
 
 ```
 f_out = 150 000 000 / (divisor × 1024)   →   divisor = 150 000 000 / (f_note × 1024)
 ```
 
-That's exactly the formula used in the code. The `notas[]` array holds one octave (Do6 to Do7), which gives these dividers:
-
-| Key | Note | Frequency (Hz) | Divider |
-|-----|------|----------------|---------|
+| Key | Note | f (Hz) | Divider |
+|---|---|---|---|
 | GPIO3  | Do  | 1046 | 140.04 |
 | GPIO4  | Re  | 1175 | 124.67 |
 | GPIO5  | Mi  | 1318 | 111.14 |
@@ -161,15 +157,24 @@ That's exactly the formula used in the code. The `notas[]` array holds one octav
 | GPIO9  | Si  | 1975 | 74.17  |
 | GPIO10 | Do  | 2093 | 69.99  |
 
-All dividers fall inside the hardware's valid range (1 to 256), which is why this octave was a good fit for `TOP = 1023`.
+All the dividers are inside the valid range (1–256), which is why this octave works with `TOP = 1023`.
 
-The **volume** is controlled with the duty cycle, set by `pwm_set_chan_level()`. The output stays high while the counter is below `volumen`, so the duty cycle is `volumen / 1024`. It starts at 256 (25 %) and the volume buttons move it in steps of 64 (≈6 %) between 0 (silent) and 512 (50 %). The limit is 50 % because a square wave at 50 % duty cycle is already the loudest for the buzzer; going higher would just make it quieter again.
+### Volume → duty cycle
 
-The main loop reads everything by polling. Each volume button has a small software debounce: a `sleep_ms(50)`, then a `while` that waits until the button is released, then another `sleep_ms(50)`, so one press only changes the volume once. Then the loop scans the 8 keys from GPIO3 upward and keeps the first one it finds pressed (`break`). If no key is pressed (`tecla == -1`) the level is set to 0 to silence the buzzer; otherwise the divider is updated to that note's frequency and the level is set to the current volume.
+- Duty = `volumen / 1024`. It starts at 256 (25 %) and moves in steps of 64, between 0 and 512.
+- The max is 50 % because that's the loudest a square wave gets on the buzzer. Going higher makes it quieter again.
+
+### Main loop (polling)
+
+- Volume buttons: `sleep_ms(50)` → wait until released → `sleep_ms(50)`, so one press = one change (debounce).
+- It scans the keys from GPIO3 up and keeps the first one pressed.
+- No key → level 0 (silence). Key pressed → set its divider and the volume.
 
 ## Results
 
-Each key plays its note while held down and the buzzer goes silent as soon as it's released, covering the full Do–Do octave. The volume buttons change the loudness in noticeable steps and the current level is printed on the serial monitor (`Volumen: ...`). When two keys are pressed at the same time, only the lower one (the lowest GPIO) sounds, since the scan stops at the first pressed key.
+- Each key plays its note while held and stops when released.
+- The volume changes in noticeable steps and is printed on the serial monitor.
+- With two keys pressed at the same time only the lower one sounds, because the scan stops at the first one.
 
 ### Video
 
@@ -177,6 +182,9 @@ Each key plays its note while held down and the buzzer goes silent as soon as it
   <source src="../piano.mp4" type="video/mp4">
 </video>
 
-## Conclusions
+## What I learned
 
-This activity showed that PWM isn't only for dimming LEDs: by changing the clock divider the same peripheral becomes a tone generator, and the duty cycle turns into a volume control. The key relationship was `f = f_clk / (divisor × (TOP + 1))`, which made it possible to calculate the exact divider for each note instead of guessing. Unlike the roulette lab, this one went back to polling, which works fine here because the loop only waits 10 ms per pass, so the keys respond immediately. Two limitations remain: the piano is monophonic (only one PWM slice drives the buzzer, so chords aren't possible), and while a volume button is held down the `while` loop blocks, so the keys can't change notes until it is released. Using interrupts for the volume buttons, like in the roulette, would remove that block.
+- PWM also works as a tone generator: the divider sets the frequency and the duty cycle sets the volume.
+- With `f = f_clk / (divisor × (TOP + 1))` I could calculate each note's exact divider instead of guessing.
+- Polling works fine here because the loop only takes 10 ms.
+- Limitations: it's monophonic (one PWM slice → no chords), and while a volume button is held the `while` blocks the keys. Using interrupts for those buttons, like in the roulette lab, would fix that.
