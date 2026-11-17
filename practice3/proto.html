@@ -1,0 +1,119 @@
+<style>
+.bb-board{fill:#F2EDE0}
+[data-mode="dark"] .bb-board{fill:#3A382F}
+@media (prefers-color-scheme: dark){:root:not([data-mode]) .bb-board{fill:#3A382F}}
+</style>
+<svg width="100%" viewBox="0 0 680 600" role="img">
+<title>Conexiones en protoboard: juego con 5 LEDs y 2 botones</title>
+<desc>Diagrama de protoboard mostrando la Raspberry Pi Pico 2W con GPIO2 a GPIO6 conectados cada uno a una resistencia de 330 ohms en serie con un LED, GPIO4 hacia el LED central marcado como ganador, y GPIO7 y GPIO8 conectados cada uno a un botón con pull-up interno, todos regresando al riel de GND.</desc>
+<rect class="bb-board" x="20" y="10" width="640" height="580" rx="16"/>
+
+<!-- GND rail -->
+<rect x="40" y="558" width="600" height="18" rx="4" fill="#2F5FA8"/>
+<text x="50" y="571" font-size="12" fill="#EAF1FB">Riel GND (–)</text>
+
+<!-- Pico 2W body, horizontal, pins along bottom edge -->
+<rect x="140" y="20" width="490" height="90" rx="8" fill="#2E7D4F" stroke="#1D5A38" stroke-width="1"/>
+<rect x="372" y="8" width="26" height="14" rx="2" fill="#B9B9B9"/>
+<text x="385" y="55" font-size="13" fill="#EAF3EA" text-anchor="middle">Raspberry Pi Pico 2W</text>
+
+<!-- Pin ticks along bottom edge -->
+<line x1="170" y1="110" x2="170" y2="125" stroke="#5A5A54" stroke-width="2"/>
+<text x="176" y="122" font-size="12" fill="var(--text-primary)">GND</text>
+<line x1="230" y1="110" x2="230" y2="125" stroke="#378ADD" stroke-width="2"/>
+<text x="236" y="122" font-size="12" fill="var(--text-primary)">GP2</text>
+<line x1="290" y1="110" x2="290" y2="125" stroke="#378ADD" stroke-width="2"/>
+<text x="296" y="122" font-size="12" fill="var(--text-primary)">GP3</text>
+<line x1="350" y1="110" x2="350" y2="125" stroke="#F2A623" stroke-width="2"/>
+<text x="356" y="122" font-size="12" fill="var(--text-primary)">GP4</text>
+<line x1="410" y1="110" x2="410" y2="125" stroke="#378ADD" stroke-width="2"/>
+<text x="416" y="122" font-size="12" fill="var(--text-primary)">GP5</text>
+<line x1="470" y1="110" x2="470" y2="125" stroke="#378ADD" stroke-width="2"/>
+<text x="476" y="122" font-size="12" fill="var(--text-primary)">GP6</text>
+<line x1="530" y1="110" x2="530" y2="125" stroke="#378ADD" stroke-width="2"/>
+<text x="536" y="122" font-size="12" fill="var(--text-primary)">GP7</text>
+<line x1="590" y1="110" x2="590" y2="125" stroke="#378ADD" stroke-width="2"/>
+<text x="596" y="122" font-size="12" fill="var(--text-primary)">GP8</text>
+
+<!-- GND straight lane -->
+<line x1="170" y1="125" x2="170" y2="558" stroke="#5A5A54" stroke-width="2"/>
+
+<!-- LED0 lane, x=230 -->
+<line x1="230" y1="125" x2="230" y2="170" stroke="#378ADD" stroke-width="2"/>
+<rect x="222" y="170" width="16" height="40" rx="3" fill="#D9C9A3" stroke="#8a7a55" stroke-width="0.5"/>
+<rect x="222" y="181" width="16" height="4" fill="#F2A623"/>
+<rect x="222" y="190" width="16" height="4" fill="#F2A623"/>
+<rect x="222" y="199" width="16" height="4" fill="#7B4B2A"/>
+<line x1="230" y1="210" x2="230" y2="225" stroke="#378ADD" stroke-width="2"/>
+<polygon points="220,225 240,225 230,250" fill="#E24B4A"/>
+<line x1="230" y1="250" x2="230" y2="265" stroke="#E24B4A" stroke-width="3"/>
+<line x1="230" y1="265" x2="230" y2="558" stroke="#5A5A54" stroke-width="2"/>
+<text x="230" y="280" font-size="12" fill="var(--text-primary)" text-anchor="middle">LED0</text>
+
+<!-- LED1 lane, x=290 -->
+<line x1="290" y1="125" x2="290" y2="170" stroke="#378ADD" stroke-width="2"/>
+<rect x="282" y="170" width="16" height="40" rx="3" fill="#D9C9A3" stroke="#8a7a55" stroke-width="0.5"/>
+<rect x="282" y="181" width="16" height="4" fill="#F2A623"/>
+<rect x="282" y="190" width="16" height="4" fill="#F2A623"/>
+<rect x="282" y="199" width="16" height="4" fill="#7B4B2A"/>
+<line x1="290" y1="210" x2="290" y2="225" stroke="#378ADD" stroke-width="2"/>
+<polygon points="280,225 300,225 290,250" fill="#E24B4A"/>
+<line x1="290" y1="250" x2="290" y2="265" stroke="#E24B4A" stroke-width="3"/>
+<line x1="290" y1="265" x2="290" y2="558" stroke="#5A5A54" stroke-width="2"/>
+<text x="290" y="280" font-size="12" fill="var(--text-primary)" text-anchor="middle">LED1</text>
+
+<!-- LED2 lane (winner), x=350 -->
+<line x1="350" y1="125" x2="350" y2="170" stroke="#F2A623" stroke-width="2"/>
+<rect x="342" y="170" width="16" height="40" rx="3" fill="#D9C9A3" stroke="#8a7a55" stroke-width="0.5"/>
+<rect x="342" y="181" width="16" height="4" fill="#F2A623"/>
+<rect x="342" y="190" width="16" height="4" fill="#F2A623"/>
+<rect x="342" y="199" width="16" height="4" fill="#7B4B2A"/>
+<line x1="350" y1="210" x2="350" y2="225" stroke="#F2A623" stroke-width="2"/>
+<polygon points="338,225 362,225 350,253" fill="#E24B4A" stroke="#F2A623" stroke-width="2"/>
+<line x1="350" y1="253" x2="350" y2="265" stroke="#E24B4A" stroke-width="3"/>
+<line x1="350" y1="265" x2="350" y2="558" stroke="#5A5A54" stroke-width="2"/>
+<text x="350" y="280" font-size="12" fill="var(--text-primary)" text-anchor="middle">LED2</text>
+<text x="350" y="295" font-size="12" fill="#854F0B" text-anchor="middle">ganador</text>
+
+<!-- LED3 lane, x=410 -->
+<line x1="410" y1="125" x2="410" y2="170" stroke="#378ADD" stroke-width="2"/>
+<rect x="402" y="170" width="16" height="40" rx="3" fill="#D9C9A3" stroke="#8a7a55" stroke-width="0.5"/>
+<rect x="402" y="181" width="16" height="4" fill="#F2A623"/>
+<rect x="402" y="190" width="16" height="4" fill="#F2A623"/>
+<rect x="402" y="199" width="16" height="4" fill="#7B4B2A"/>
+<line x1="410" y1="210" x2="410" y2="225" stroke="#378ADD" stroke-width="2"/>
+<polygon points="400,225 420,225 410,250" fill="#E24B4A"/>
+<line x1="410" y1="250" x2="410" y2="265" stroke="#E24B4A" stroke-width="3"/>
+<line x1="410" y1="265" x2="410" y2="558" stroke="#5A5A54" stroke-width="2"/>
+<text x="410" y="280" font-size="12" fill="var(--text-primary)" text-anchor="middle">LED3</text>
+
+<!-- LED4 lane, x=470 -->
+<line x1="470" y1="125" x2="470" y2="170" stroke="#378ADD" stroke-width="2"/>
+<rect x="462" y="170" width="16" height="40" rx="3" fill="#D9C9A3" stroke="#8a7a55" stroke-width="0.5"/>
+<rect x="462" y="181" width="16" height="4" fill="#F2A623"/>
+<rect x="462" y="190" width="16" height="4" fill="#F2A623"/>
+<rect x="462" y="199" width="16" height="4" fill="#7B4B2A"/>
+<line x1="470" y1="210" x2="470" y2="225" stroke="#378ADD" stroke-width="2"/>
+<polygon points="460,225 480,225 470,250" fill="#E24B4A"/>
+<line x1="470" y1="250" x2="470" y2="265" stroke="#E24B4A" stroke-width="3"/>
+<line x1="470" y1="265" x2="470" y2="558" stroke="#5A5A54" stroke-width="2"/>
+<text x="470" y="280" font-size="12" fill="var(--text-primary)" text-anchor="middle">LED4</text>
+
+<!-- Button 1, x=530 (win/restart) -->
+<line x1="530" y1="125" x2="530" y2="200" stroke="#378ADD" stroke-width="2"/>
+<rect x="512" y="200" width="36" height="26" rx="4" fill="#B4B2A9" stroke="#5F5E5A" stroke-width="1"/>
+<circle cx="520" cy="213" r="2.5" fill="#2C2C2A"/>
+<circle cx="540" cy="213" r="2.5" fill="#2C2C2A"/>
+<line x1="530" y1="226" x2="530" y2="558" stroke="#5A5A54" stroke-width="2"/>
+<text x="530" y="242" font-size="12" fill="var(--text-primary)" text-anchor="middle">Botón 1</text>
+<text x="530" y="257" font-size="12" fill="var(--text-secondary)" text-anchor="middle">gana / reinicia</text>
+
+<!-- Button 2, x=590 (speed) -->
+<line x1="590" y1="125" x2="590" y2="200" stroke="#378ADD" stroke-width="2"/>
+<rect x="572" y="200" width="36" height="26" rx="4" fill="#B4B2A9" stroke="#5F5E5A" stroke-width="1"/>
+<circle cx="580" cy="213" r="2.5" fill="#2C2C2A"/>
+<circle cx="600" cy="213" r="2.5" fill="#2C2C2A"/>
+<line x1="590" y1="226" x2="590" y2="558" stroke="#5A5A54" stroke-width="2"/>
+<text x="590" y="242" font-size="12" fill="var(--text-primary)" text-anchor="middle">Botón 2</text>
+<text x="590" y="257" font-size="12" fill="var(--text-secondary)" text-anchor="middle">velocidad</text>
+</svg>
